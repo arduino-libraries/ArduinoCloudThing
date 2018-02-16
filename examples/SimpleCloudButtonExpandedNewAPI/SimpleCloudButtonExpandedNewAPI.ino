@@ -18,6 +18,8 @@ const char thingName[] = SECRET_THING_NAME;
 const char thingId[] = SECRET_THING_ID;
 const char thingPsw[]  = SECRET_THING_PSW;
 
+#define Serial DebugSerial
+
 //WiFiSSLClient sslClient;
 WiFiClient sslClient;
 
@@ -92,6 +94,7 @@ void loop() {
 
   delay(1000);
 
+#ifndef ARDUINO_ARCH_MRAA
   if ( WiFi.status() != WL_CONNECTED) {
     while (WiFi.begin(ssid, pass) != WL_CONNECTED) {
       // unsuccessful, retry in 4 seconds
@@ -100,5 +103,5 @@ void loop() {
       Serial.print("retrying ... ");
     }
   }
-
+#endif
 }
