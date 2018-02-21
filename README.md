@@ -16,13 +16,17 @@ _How to use_
 
 * To add a property
 
-`thing.addProperty(variable, READWRITE)`
+`thing.addProperty(variable)`
 
 `variable` can be an `int`, a `bool`, a `String` or a `float`. You can use that variable anywhere and its value will be transparently updated when the remote backend writes it.
 
 Additional configuration can be added to the property via composition
 
 `.publishEvery(long seconds)` configures a property to report its status (even if unchanged) every x seconds
+
+`.readOnly()`
+
+`.writeOnly()`
 
 `.onUpdate(functionPointer)` configures the property to call `functionPointer` when the value is called by the backend. This ensures the minumum amount of check can be performed inside the actual loop()
 
