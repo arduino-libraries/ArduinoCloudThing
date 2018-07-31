@@ -16,6 +16,7 @@ class CborObject {
   void set(const char* key, CborVariant value);
   void set(const char* key, const char* value);
   void set(const char* key, CBOR_INT_T value);
+  void set(const char* key, CBOR_FLOAT_T value);
   void set(const char* key, CborObject value);
   void set(const char* key, CborArray value);
 

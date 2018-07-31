@@ -11,6 +11,7 @@ class CborVariant {
   CborVariant(CborBuffer& buffer, cn_cbor* raw);
   CborVariant(CborBuffer& buffer, const char* value);
   CborVariant(CborBuffer& buffer, CBOR_INT_T value);
+  CborVariant(CborBuffer& buffer, CBOR_FLOAT_T value);
   CborVariant(CborBuffer& buffer, CborObject& value);
   CborVariant(CborBuffer& buffer, CborArray& value);
 
@@ -19,11 +20,13 @@ class CborVariant {
   bool isValid();
   bool isString();
   bool isInteger();
+  bool isFloat();
   bool isObject();
   bool isArray();
 
   const char* asString();
   CBOR_INT_T asInteger();
+  CBOR_FLOAT_T asFloat();
   CborObject asObject();
   CborArray asArray();
 

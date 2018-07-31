@@ -14,6 +14,8 @@ extern "C" {
 #include <assert.h>
 #include <math.h>
 
+//#include <arpa/inet.h> // needed for ntohl (e.g.) on Linux
+
 #include "cn-cbor.h"
 #include "../cbor.h"
 
@@ -48,13 +50,13 @@ static double decode_half(int half) {
 }
 #endif /* CBOR_NO_FLOAT */
 
+
 uint16_t htons(uint16_t v) {
   return (v >> 8) | (v << 8);
 }
 uint32_t htonl(uint32_t v) {
   return htons(v >> 16) | (htons((uint16_t) v) << 16);
 }
-
 uint16_t ntohs(uint16_t v) {
   return htons(v);
 }
@@ -62,10 +64,25 @@ uint32_t ntohl(uint32_t v) {
   return htonl(v);
 }
 
-/* Fix these if you can't do non-aligned reads */
 #define ntoh8p(p) (*(unsigned char*)(p))
+
+#ifndef CBOR_ALIGN_READS
 #define ntoh16p(p) (ntohs(*(unsigned short*)(p)))
 #define ntoh32p(p) (ntohl(*(unsigned long*)(p)))
+#else
+static uint16_t ntoh16p(unsigned char *p) {
+    uint16_t tmp;
+    memcpy(&tmp, p, sizeof(tmp));
+    return ntohs(tmp);
+}
+
+static uint32_t ntoh32p(unsigned char *p) {
+    uint32_t tmp;
+    memcpy(&tmp, p, sizeof(tmp));
+    return ntohl(tmp);
+}
+#endif /* CBOR_ALIGN_READS */
+
 static uint64_t ntoh64p(unsigned char *p) {
   uint64_t ret = ntoh32p(p);
   ret <<= 32;
@@ -260,6 +277,7 @@ cn_cbor* cn_cbor_decode(const unsigned char* buf, size_t len CBOR_CONTEXT, cn_cb
   pb.ebuf = (unsigned char *)buf+len;
   pb.err  = CN_CBOR_NO_ERROR;
   ret = decode_item(&pb CBOR_CONTEXT_PARAM, &catcher);
+
   if (ret != NULL) {
     /* mark as top node */
     ret->parent = NULL;

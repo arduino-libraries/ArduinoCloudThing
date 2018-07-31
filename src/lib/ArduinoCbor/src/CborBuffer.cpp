@@ -41,6 +41,6 @@ CborVariant CborBuffer::decode(uint8_t* data, size_t size) {
   cn_cbor_errback err;
 
   raw = cn_cbor_decode(data, size, &context, &err);
-
   return CborVariant(*this, raw);
+  Serial.println("error");Serial.println(err.err);
 }

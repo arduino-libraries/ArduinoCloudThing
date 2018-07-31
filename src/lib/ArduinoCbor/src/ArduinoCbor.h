@@ -9,6 +9,10 @@
 #define CBOR_INT_T int
 #endif
 
+#ifndef CBOR_FLOAT_T
+#define CBOR_FLOAT_T float
+#endif
+
 class CborArray;
 class CborBuffer;
 class CborObject;

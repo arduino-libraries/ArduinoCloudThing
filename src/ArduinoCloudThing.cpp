@@ -66,6 +66,7 @@ int ArduinoCloudThing::publish(CborArray& object, uint8_t* data, size_t size) {
 int ArduinoCloudThing::poll(uint8_t* data, size_t size) {
 
     // check if backing storage and cloud has diverged
+    // time interval may be elapsed or property may be changed
     int diff = 0;
 
     diff = checkNewData();
@@ -87,10 +88,13 @@ void ArduinoCloudThing::compress(CborArray& object, CborBuffer& buffer) {
 
     for (int i = 0; i < list.size(); i++) {
         ArduinoCloudPropertyGeneric *p = list.get(i);
+        // If a property should be updated and has read permission from the Cloud point of view
         if (p->shouldBeUpdated() && p->canRead()) {
             CborObject child = CborObject(buffer);
+            // Create the CBOR obj representing the property
             p->append(child);
             CborVariant variant = CborVariant(buffer, child);
+            // Add the encoded property to the CBOR array that has to be sent.
             object.add(variant);
         }
     }
@@ -104,12 +108,14 @@ int ArduinoCloudThing::checkNewData() {
             counter++;
         }
     }
+    // return number of props that has tu be updated
     return counter;
 }
 
 ArduinoCloudPropertyGeneric* ArduinoCloudThing::exists(String &name) {
     for (int i = 0; i < list.size(); i++) {
         ArduinoCloudPropertyGeneric *p = list.get(i);
+        // Check the property existance just comparing its name with existent ones
         if (p->getName() == name) {
             return p;
         }
@@ -117,114 +123,115 @@ ArduinoCloudPropertyGeneric* ArduinoCloudThing::exists(String &name) {
     return NULL;
 }
 
+// It return the index of the property, inside the local array, with the name passed as parameter. (-1 if it does not exist.)
+int ArduinoCloudThing::findPropertyByName(String &name) {
+    for (int i = 0; i < list.size(); i++) {
+        ArduinoCloudPropertyGeneric *p = list.get(i);
+        // Check the property existance just comparing its name with existent ones
+        if (p->getName() == name) {
+            return i;
+        }
+    }
+    return -1;
+}
+
 ArduinoCloudPropertyGeneric& ArduinoCloudThing::addPropertyReal(int& property, String name) {
     if (ArduinoCloudPropertyGeneric* p = exists(name)) {
         return *p;
     }
-    ArduinoCloudProperty<int> *thing = new ArduinoCloudProperty<int>(property, name);
-    list.add(thing);
-    return *(reinterpret_cast<ArduinoCloudPropertyGeneric*>(thing));
+    ArduinoCloudProperty<int> *propertyObj = new ArduinoCloudProperty<int>(property, name);
+    list.add(propertyObj);
+    return *(reinterpret_cast<ArduinoCloudPropertyGeneric*>(propertyObj));
 }
 
 ArduinoCloudPropertyGeneric& ArduinoCloudThing::addPropertyReal(bool& property, String name) {
     if (ArduinoCloudPropertyGeneric* p = exists(name)) {
         return *p;
     }
-    ArduinoCloudProperty<bool> *thing = new ArduinoCloudProperty<bool>(property, name);
-    list.add(thing);
-    return *(reinterpret_cast<ArduinoCloudPropertyGeneric*>(thing));
+    ArduinoCloudProperty<bool> *propertyObj = new ArduinoCloudProperty<bool>(property, name);
+    list.add(propertyObj);
+    return *(reinterpret_cast<ArduinoCloudPropertyGeneric*>(propertyObj));
 }
 
 ArduinoCloudPropertyGeneric& ArduinoCloudThing::addPropertyReal(float& property, String name) {
     if (ArduinoCloudPropertyGeneric* p = exists(name)) {
         return *p;
     }
-    ArduinoCloudProperty<float> *thing = new ArduinoCloudProperty<float>(property, name);
-    list.add(thing);
-    return *(reinterpret_cast<ArduinoCloudPropertyGeneric*>(thing));
+    ArduinoCloudProperty<float> *propertyObj = new ArduinoCloudProperty<float>(property, name);
+    list.add(propertyObj);
+    return *(reinterpret_cast<ArduinoCloudPropertyGeneric*>(propertyObj));
 }
 
+ArduinoCloudPropertyGeneric& ArduinoCloudThing::addPropertyReal(String& property, String name) {
+    if (ArduinoCloudPropertyGeneric* p = exists(name)) {
+        return *p;
+    }
+    ArduinoCloudProperty<String> *propertyObj = new ArduinoCloudProperty<String>(property, name);
+    list.add(propertyObj);
+    return *(reinterpret_cast<ArduinoCloudPropertyGeneric*>(propertyObj));
+}
+
+
 void ArduinoCloudThing::decode(uint8_t * payload, size_t length) {
+    Serial.print("Entered into decode..");
     CborBuffer buffer(200);
+    Serial.print("Created CBOR buffer");
     CborVariant total = buffer.decode(payload, length);
-
+    Serial.print("CBOR decoded..");
+    int propId;
+    String propType;
+    // It will contain the entire array of properties
     CborArray array = total.asArray();
+    Serial.print("Retrieved array..");
 
+    
+
+    // Scan all properties into received array
     for (int i=0; ;i++) {
-    CborVariant variant = array.get(i);
+        CborVariant variant = array.get(i);
 
-        if (!variant.isValid()) {
-            break;
-        }
-
-
+        // Check CBOR object validity, otherwise skip it.
+        if (!variant.isValid()) continue;
         CborObject object = variant.asObject();
 
         String name = "";
+        // get the property name, if no name do nothing!
         if (object.get("n").isValid()) {
             name = object.get("n").asString();
-            // search for the property with the same name
-            for (int idx = 0; idx < list.size(); idx++) {
-                ArduinoCloudPropertyGeneric *p = list.get(idx);
-                if (p->getName() == name) {
-                    currentListIndex = idx;
-                    break;
-                }
-                if (idx == list.size()) {
-                    currentListIndex = -1;
-                }
+
+            Serial.print("Received prop name: "); Serial.println(name);
+
+            // Search for the index of the device property with that name
+            propId = findPropertyByName(name);
+            // If property does not exist, skip it and do nothing.
+            if (propId < 0) continue;
+            ArduinoCloudPropertyGeneric* property = list.get(propId);
+
+            // Check for the property type, write method internally check for the permission
+            propType = property->getType();
+            if (propType == "INT" && object.get("v").isValid()) {
+                int value = object.get("v").asInteger();
+                ArduinoCloudProperty<int>* p = (ArduinoCloudProperty<int>*) property;
+                p->write(value);
+            } else if (propType == "BOOL" && object.get("vb").isValid()) {
+                bool value = object.get("vb").asInteger();
+                ArduinoCloudProperty<bool>* p = (ArduinoCloudProperty<bool>*) property;
+                p->write(value);
+            } else if (propType == "FLOAT" && object.get("v").isValid()) {
+                float value = object.get("v").asFloat();
+                ArduinoCloudProperty<float>* p = (ArduinoCloudProperty<float>*) property;
+                p->write(value);
+            } else if (propType == "STRING" && object.get("vd").isValid()){
+                String value = object.get("vs").asString();
+                ArduinoCloudProperty<String>* p = (ArduinoCloudProperty<String>*) property;
+                //p->write(value);
             }
-        }
 
-        if (object.get("t").isValid()) {
-            int tag = object.get("t").asInteger();
-            if (name != "") {
-                list.get(currentListIndex)->setTag(tag);
-            } else {
-                for (int idx = 0; idx < list.size(); idx++) {
-                    ArduinoCloudPropertyGeneric *p = list.get(idx);
-                    if (p->getTag() == tag) {
-                        // if name == "" associate name and tag, otherwise set current list index
-                        currentListIndex = idx;
-                        break;
-                    }
-                    if (idx == list.size()) {
-                        Serial.println("Property not found, skipping");
-                        currentListIndex = -1;
-                    }
+            // If the property is changed call its callback
+            if (property->newData()) {
+                if (property->callback != NULL) {
+                    property->callback();
                 }
-            }
-        }
-
-        if (object.get("i").isValid()) {
-            int value_i = object.get("i").asInteger();
-            reinterpret_cast<ArduinoCloudProperty<int>*>(list.get(currentListIndex))->write(value_i);
-        }
-
-        if (object.get("b").isValid()) {
-            bool value_b = object.get("b").asInteger();
-            reinterpret_cast<ArduinoCloudProperty<bool>*>(list.get(currentListIndex))->write(value_b);
-        }
-/*
-        if (object.get("f").isValid()) {
-            float value_f = object.get("f").asFloat();
-            reinterpret_cast<ArduinoCloudProperty<bool>*>(list.get(currentListIndex))->write(value_f);
-        }
-*/
-        if (object.get("s").isValid()) {
-            String value_s = object.get("s").asString();
-            reinterpret_cast<ArduinoCloudProperty<String>*>(list.get(currentListIndex))->write(value_s);
-        }
-
-        if (object.get("p").isValid()) {
-            permissionType value_p = (permissionType)object.get("p").asInteger();
-            list.get(currentListIndex)->setPermission(value_p);
-        }
-
-        if (list.get(currentListIndex)->newData()) {
-            // call onUpdate()
-            if (list.get(currentListIndex)->callback != NULL) {
-                list.get(currentListIndex)->callback();
             }
         }
     }

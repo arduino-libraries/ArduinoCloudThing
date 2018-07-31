@@ -16,6 +16,12 @@ CborVariant::CborVariant(CborBuffer& buffer, CBOR_INT_T value) : buffer(buffer) 
   raw = cn_cbor_int_create(value, &buffer.context, &err);
 }
 
+CborVariant::CborVariant(CborBuffer& buffer, CBOR_FLOAT_T value) : buffer(buffer) {
+  cn_cbor_errback err;
+
+  raw = cn_cbor_float_create(value, &buffer.context, &err);
+}
+
 CborVariant::CborVariant(CborBuffer& buffer, CborObject& value) : buffer(buffer) {
   this->raw = value.raw;
 }
@@ -42,6 +48,10 @@ bool CborVariant::isString() {
 
 bool CborVariant::isInteger() {
   return isValid() && raw->type == CN_CBOR_UINT || raw->type == CN_CBOR_INT;
+}
+
+bool CborVariant::isFloat() {
+  return isValid() && raw->type == CN_CBOR_FLOAT;
 }
 
 bool CborVariant::isObject() {
@@ -85,6 +95,18 @@ CBOR_INT_T CborVariant::asInteger() {
 
   if (raw->type == CN_CBOR_INT) {
     return raw->v.sint;
+  }
+
+  return 0;
+}
+
+CBOR_FLOAT_T CborVariant::asFloat() {
+  if (!isValid()) {
+    return 0;
+  }
+
+  if (raw->type == CN_CBOR_FLOAT) {
+    return raw->v.f;
   }
 
   return 0;
