@@ -13,7 +13,6 @@ extern "C" {
 #include <string.h>
 #include <assert.h>
 #include <math.h>
-
 //#include <arpa/inet.h> // needed for ntohl (e.g.) on Linux
 
 #include "cn-cbor.h"
@@ -57,6 +56,7 @@ uint16_t htons(uint16_t v) {
 uint32_t htonl(uint32_t v) {
   return htons(v >> 16) | (htons((uint16_t) v) << 16);
 }
+
 uint16_t ntohs(uint16_t v) {
   return htons(v);
 }
@@ -268,16 +268,18 @@ fail:
   return 0;
 }
 
-cn_cbor* cn_cbor_decode(const unsigned char* buf, size_t len CBOR_CONTEXT, cn_cbor_errback *errp) {
+cn_cbor* cn_cbor_decode(const unsigned char* buf, size_t len CBOR_CONTEXT, cn_cbor_errback *errp, void(*fn)(int)) {
   cn_cbor catcher = {CN_CBOR_INVALID, 0, {0}, 0, NULL, NULL, NULL, NULL};
   struct parse_buf pb;
   cn_cbor* ret;
+
+  //fn(1);
 
   pb.buf  = (unsigned char *)buf;
   pb.ebuf = (unsigned char *)buf+len;
   pb.err  = CN_CBOR_NO_ERROR;
   ret = decode_item(&pb CBOR_CONTEXT_PARAM, &catcher);
-
+  
   if (ret != NULL) {
     /* mark as top node */
     ret->parent = NULL;

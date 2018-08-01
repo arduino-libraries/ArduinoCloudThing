@@ -211,20 +211,24 @@ void ArduinoCloudThing::decode(uint8_t * payload, size_t length) {
             propType = property->getType();
             if (propType == "INT" && object.get("v").isValid()) {
                 int value = object.get("v").asInteger();
+                Serial.print("Received prop int value: "); Serial.println(object.get("v").asInteger());
                 ArduinoCloudProperty<int>* p = (ArduinoCloudProperty<int>*) property;
                 p->write(value);
             } else if (propType == "BOOL" && object.get("vb").isValid()) {
                 bool value = object.get("vb").asInteger();
+                Serial.print("Received prop bool value: "); Serial.println(value);
                 ArduinoCloudProperty<bool>* p = (ArduinoCloudProperty<bool>*) property;
                 p->write(value);
-            } else if (propType == "FLOAT" && object.get("v").isValid()) {
+            } else if (propType == "FLOAT" && object.get("v").isValid()) { 
                 float value = object.get("v").asFloat();
+                Serial.print("Received prop float value: "); Serial.println(value);
                 ArduinoCloudProperty<float>* p = (ArduinoCloudProperty<float>*) property;
                 p->write(value);
-            } else if (propType == "STRING" && object.get("vd").isValid()){
+            } else if (propType == "STRING" && object.get("vd").isValid()){ 
                 String value = object.get("vs").asString();
-                ArduinoCloudProperty<String>* p = (ArduinoCloudProperty<String>*) property;
-                //p->write(value);
+                Serial.print("Received prop string value: "); Serial.println(value);
+                ArduinoCloudProperty<String&>* p = (ArduinoCloudProperty<String&>*) property;
+                p->write(value);
             }
 
             // If the property is changed call its callback

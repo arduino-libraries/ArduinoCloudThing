@@ -5,6 +5,13 @@ ArduinoCloudProperty<T>::ArduinoCloudProperty(T& _property, String _name) :
     property(_property), name(_name) {}
 
 
+template <>
+ArduinoCloudProperty<String>::ArduinoCloudProperty(T& _property, String _name) {
+    property = _property;
+    name = new String(name);
+}
+
+
 template <typename T>
 bool ArduinoCloudProperty<T>::write(T value) {
     /* permissions are intended as seen from cloud */
@@ -114,9 +121,13 @@ bool ArduinoCloudProperty<T>::newData() {
     return (property != shadow_property && abs(property - shadow_property) > minDelta );
 }
 
- 
 template <>
 bool ArduinoCloudProperty<String>::newData() {
+    return property != shadow_property;
+}
+
+template <>
+bool ArduinoCloudProperty<bool>::newData() {
     return property != shadow_property;
 }
 
@@ -181,4 +192,4 @@ inline void ArduinoCloudProperty<String>::appendValue(CborObject &cbor) {
 template class ArduinoCloudProperty<int>;
 template class ArduinoCloudProperty<float>;
 template class ArduinoCloudProperty<bool>; 
-//template class ArduinoCloudProperty<String>; 
+template class ArduinoCloudProperty<String>; 

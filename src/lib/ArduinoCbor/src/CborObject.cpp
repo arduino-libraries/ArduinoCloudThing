@@ -1,5 +1,4 @@
 #include "CborObject.h"
-#include "Arduino.h"
 
 CborObject::CborObject(CborBuffer& buffer, cn_cbor* raw) : buffer(buffer) {
   this->raw = raw;
@@ -36,7 +35,6 @@ void CborObject::set(const char* key, CBOR_INT_T value) {
 }
 
 void CborObject::set(const char* key, CBOR_FLOAT_T value) {
-  Serial.println("Created Float Property");
   set(key, CborVariant(buffer, value));
 }
 

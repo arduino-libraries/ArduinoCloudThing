@@ -223,7 +223,7 @@ typedef struct cn_cbor_context {
  * @param[out] errp         Error, if NULL is returned
  * @return                  The parsed CBOR structure, or NULL on error
  */
-cn_cbor* cn_cbor_decode(const uint8_t *buf, size_t len CBOR_CONTEXT, cn_cbor_errback *errp);
+cn_cbor* cn_cbor_decode(const uint8_t *buf, size_t len CBOR_CONTEXT, cn_cbor_errback *errp, void(*fn)(int));
 
 /**
  * Get a value from a CBOR map that has the given string as a key.
