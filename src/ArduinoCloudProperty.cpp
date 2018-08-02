@@ -1,16 +1,9 @@
 #include <ArduinoCloudProperty.h>
 
+
 template <typename T>
 ArduinoCloudProperty<T>::ArduinoCloudProperty(T& _property, String _name) :
     property(_property), name(_name) {}
-
-
-template <>
-ArduinoCloudProperty<String>::ArduinoCloudProperty(T& _property, String _name) {
-    property = _property;
-    name = new String(name);
-}
-
 
 template <typename T>
 bool ArduinoCloudProperty<T>::write(T value) {
@@ -22,14 +15,34 @@ bool ArduinoCloudProperty<T>::write(T value) {
     return false;
 }
 
+template <>
+bool ArduinoCloudProperty<String*>::write(String *value) {
+    /* permissions are intended as seen from cloud */
+    if ((permission & READWRITE) >> 1) {
+        *property = *value;
+        return true;
+    }
+    return false;
+}
+
 template <typename T>
 void ArduinoCloudProperty<T>::printinfo() {
     Serial.println("name: " + name + " value: " + String(property) + " shadow: " + String(shadow_property) + " permission: " + String(permission));
 }
 
+template <>
+void ArduinoCloudProperty<String*>::printinfo() {
+    Serial.println("name: " + name + " value: " + *property + " shadow: " + *shadow_property + " permission: " + String(permission));
+}
+
 template <typename T>
 void ArduinoCloudProperty<T>::updateShadow() {
     shadow_property = property;
+}
+
+template <>
+void ArduinoCloudProperty<String*>::updateShadow() {
+    shadow_property = new String(*property);
 }
 
 template <typename T>
@@ -122,8 +135,8 @@ bool ArduinoCloudProperty<T>::newData() {
 }
 
 template <>
-bool ArduinoCloudProperty<String>::newData() {
-    return property != shadow_property;
+bool ArduinoCloudProperty<String*>::newData() {
+    return *property != *shadow_property;
 }
 
 template <>
@@ -184,7 +197,7 @@ inline void ArduinoCloudProperty<float>::appendValue(CborObject &cbor) {
 
 template <>
 inline void ArduinoCloudProperty<String>::appendValue(CborObject &cbor) {
-    cbor.set("vs", property.c_str());
+    cbor.set("vs", *property.c_str());
 };
 
 
@@ -192,4 +205,4 @@ inline void ArduinoCloudProperty<String>::appendValue(CborObject &cbor) {
 template class ArduinoCloudProperty<int>;
 template class ArduinoCloudProperty<float>;
 template class ArduinoCloudProperty<bool>; 
-template class ArduinoCloudProperty<String>; 
+

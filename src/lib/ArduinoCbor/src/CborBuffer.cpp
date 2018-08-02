@@ -37,15 +37,8 @@ uint8_t* CborBuffer::alloc(size_t size) {
   return data;
 }
 
-void debugFunc(int a) {
-  Serial.print("Debug: "); Serial.println(a);
-}
-
 CborVariant CborBuffer::decode(uint8_t* data, size_t size) {
   cn_cbor_errback err;
-  Serial.println("Decoding... ");
-  debugFunc(0);
   raw = cn_cbor_decode(data, size, &context, &err, debugFunc);
-  Serial.print("CBOR error: "); Serial.println(cn_cbor_error_str[err.err]);
   return CborVariant(*this, raw);
 }

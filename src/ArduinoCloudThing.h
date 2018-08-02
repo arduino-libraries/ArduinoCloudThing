@@ -2,6 +2,8 @@
 #define ArduinoCloudThing_h
 
 #include <ArduinoCloudProperty.h>
+#include <ArduinoCloudStringProperty.h>
+
 #include <Client.h>
 #include <Stream.h>
 #include "lib/LinkedList/LinkedList.h"

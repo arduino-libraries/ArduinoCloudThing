@@ -166,32 +166,26 @@ ArduinoCloudPropertyGeneric& ArduinoCloudThing::addPropertyReal(String& property
     if (ArduinoCloudPropertyGeneric* p = exists(name)) {
         return *p;
     }
-    ArduinoCloudProperty<String> *propertyObj = new ArduinoCloudProperty<String>(property, name);
+    ArduinoCloudStringProperty *propertyObj = new ArduinoCloudStringProperty(property, name);
     list.add(propertyObj);
     return *(reinterpret_cast<ArduinoCloudPropertyGeneric*>(propertyObj));
 }
 
 
 void ArduinoCloudThing::decode(uint8_t * payload, size_t length) {
-    Serial.print("Entered into decode..");
     CborBuffer buffer(200);
-    Serial.print("Created CBOR buffer");
     CborVariant total = buffer.decode(payload, length);
-    Serial.print("CBOR decoded..");
     int propId;
     String propType;
     // It will contain the entire array of properties
     CborArray array = total.asArray();
-    Serial.print("Retrieved array..");
-
-    
 
     // Scan all properties into received array
     for (int i=0; ;i++) {
         CborVariant variant = array.get(i);
 
-        // Check CBOR object validity, otherwise skip it.
-        if (!variant.isValid()) continue;
+        // Check CBOR object validity, if it is not valid, there are no more received properties.
+        if (!variant.isValid()) break;
         CborObject object = variant.asObject();
 
         String name = "";
@@ -199,16 +193,16 @@ void ArduinoCloudThing::decode(uint8_t * payload, size_t length) {
         if (object.get("n").isValid()) {
             name = object.get("n").asString();
 
-            Serial.print("Received prop name: "); Serial.println(name);
-
             // Search for the index of the device property with that name
             propId = findPropertyByName(name);
             // If property does not exist, skip it and do nothing.
             if (propId < 0) continue;
             ArduinoCloudPropertyGeneric* property = list.get(propId);
+            Serial.print("-- Received prop name: "); Serial.println(property->getName());
 
             // Check for the property type, write method internally check for the permission
             propType = property->getType();
+
             if (propType == "INT" && object.get("v").isValid()) {
                 int value = object.get("v").asInteger();
                 Serial.print("Received prop int value: "); Serial.println(object.get("v").asInteger());
@@ -224,10 +218,10 @@ void ArduinoCloudThing::decode(uint8_t * payload, size_t length) {
                 Serial.print("Received prop float value: "); Serial.println(value);
                 ArduinoCloudProperty<float>* p = (ArduinoCloudProperty<float>*) property;
                 p->write(value);
-            } else if (propType == "STRING" && object.get("vd").isValid()){ 
+            } else if (propType == "STRING" && object.get("vs").isValid()){ 
                 String value = object.get("vs").asString();
                 Serial.print("Received prop string value: "); Serial.println(value);
-                ArduinoCloudProperty<String&>* p = (ArduinoCloudProperty<String&>*) property;
+                ArduinoCloudStringProperty* p = (ArduinoCloudStringProperty*) property;
                 p->write(value);
             }
 
