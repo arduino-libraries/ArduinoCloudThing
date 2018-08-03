@@ -2,10 +2,11 @@
 #define ArduinoCloudPropertyGeneric_h
 
 #include <Arduino.h>
-#include "lib/ArduinoCbor/src/ArduinoCbor.h"
+// include of the cbor library
+#include "lib/CBOR/cbor-lib.h"
 
 // Define the policy for the property.
-// If policy !ON_CHANGE is considered a tyming one as default
+// If policy !ON_CHANGE is considered a timing one as default
 static const int ON_CHANGE = -1;
 
 // Define the permissionh type for a generic property
@@ -17,7 +18,7 @@ enum permissionType {
 // Declaration of Generic property interface. How a property must look like.
 class ArduinoCloudPropertyGeneric {
 public:
-    virtual void append(CborObject& object) = 0;
+    virtual void append(CborEncoder* encoder) = 0;
     virtual String& getName() = 0;
     virtual void setName(String _name) = 0;
     virtual ArduinoCloudPropertyGeneric& setTag(int _tag) = 0;

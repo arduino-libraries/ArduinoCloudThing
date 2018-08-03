@@ -73,16 +73,21 @@ ArduinoCloudPropertyGeneric& ArduinoCloudStringProperty::onUpdate(void(*fn)(void
     return *(reinterpret_cast<ArduinoCloudPropertyGeneric*>(this));
 }
 
-void ArduinoCloudStringProperty::append(CborObject &cbor) {
-    if (!canRead()) {
+void ArduinoCloudStringProperty::append(CborEncoder* encoder) {
+    if (!canRead()) 
         return;
-    }
+
+    CborEncoder *mapEncoder;
+    cbor_encoder_create_map(encoder, mapEncoder, CborIndefiniteLength);
     if (tag != -1) {
-        cbor.set("t", tag);
+        cbor_encode_text_stringz(mapEncoder, "t");
+        cbor_encode_int(mapEncoder, tag);
     } else {
-        cbor.set("n", name.c_str());
+        cbor_encode_text_stringz(mapEncoder, "n");
+        cbor_encode_text_stringz(mapEncoder, name.c_str());
     }
-    appendValue(cbor);
+    appendValue(mapEncoder);
+    cbor_encoder_close_container(encoder, mapEncoder);
     lastUpdated = millis();
 }
 
@@ -108,7 +113,8 @@ String ArduinoCloudStringProperty::getType() {
     return type;
 }
 
-inline void ArduinoCloudStringProperty::appendValue(CborObject &cbor) {
-    cbor.set("vs", property.c_str());
+inline void ArduinoCloudStringProperty::appendValue(CborEncoder* mapEncoder) {
+    cbor_encode_text_stringz(mapEncoder, "vs");
+    cbor_encode_text_stringz(mapEncoder, property.c_str());
 };
  

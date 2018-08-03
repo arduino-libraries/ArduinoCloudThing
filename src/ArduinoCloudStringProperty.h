@@ -21,8 +21,8 @@ class ArduinoCloudStringProperty : public ArduinoCloudPropertyGeneric {
         ArduinoCloudPropertyGeneric& minimumDelta(void* delta);
         permissionType getPermission();
         ArduinoCloudPropertyGeneric& onUpdate(void(*fn)(void));
-        void appendValue(CborObject &cbor);
-        void append(CborObject &cbor);
+        void appendValue(CborEncoder* mapEncoder);
+        void append(CborEncoder* encoder);
         ArduinoCloudPropertyGeneric& publishEvery(long seconds);
         bool newData();
         bool shouldBeUpdated();

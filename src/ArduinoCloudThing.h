@@ -1,13 +1,14 @@
 #ifndef ArduinoCloudThing_h
 #define ArduinoCloudThing_h
 
+#include <Client.h>
+#include <Stream.h>
+
 #include <ArduinoCloudProperty.h>
 #include <ArduinoCloudStringProperty.h>
 
-#include <Client.h>
-#include <Stream.h>
 #include "lib/LinkedList/LinkedList.h"
-#include "lib/ArduinoCbor/src/ArduinoCbor.h"
+
 
 
 enum boolStatus {
@@ -37,11 +38,8 @@ public:
     void decode(uint8_t * payload, size_t length);
 
 private:
-    int publish(CborArray& object, uint8_t* data, size_t size);
-
     void update();
     int checkNewData();
-    void compress(CborArray& object, CborBuffer& buffer);
 
     ArduinoCloudPropertyGeneric* exists(String &name);
     int findPropertyByName(String &name);

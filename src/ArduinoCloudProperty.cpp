@@ -109,17 +109,21 @@ ArduinoCloudPropertyGeneric& ArduinoCloudProperty<T>::onUpdate(void(*fn)(void)) 
 }
 
 template <typename T>
-void ArduinoCloudProperty<T>::append(CborObject &cbor) {
-    if (!canRead()) {
+void ArduinoCloudProperty<T>::append(CborEncoder* encoder) {
+    if (!canRead()) 
         return;
-    }
+    
+    CborEncoder *mapEncoder;
+    cbor_encoder_create_map(encoder, mapEncoder, CborIndefiniteLength);
     if (tag != -1) {
-        cbor.set("t", tag);
+        cbor_encode_text_stringz(mapEncoder, "t");
+        cbor_encode_int(mapEncoder, tag);
     } else {
-        cbor.set("n", name.c_str());
+        cbor_encode_text_stringz(mapEncoder, "n");
+        cbor_encode_text_stringz(mapEncoder, name.c_str());
     }
-    appendValue(cbor);
-    //cbor.set("p", permission);
+    appendValue(mapEncoder);
+    cbor_encoder_close_container(encoder, mapEncoder);
     lastUpdated = millis();
 }
 
@@ -181,25 +185,22 @@ String ArduinoCloudProperty<String>::getType() {
 
 // Specific template definitions for different data types
 template <>
-inline void ArduinoCloudProperty<int>::appendValue(CborObject &cbor) {
-    cbor.set("v", (float)property);
+inline void ArduinoCloudProperty<int>::appendValue(CborEncoder* mapEncoder) {
+    cbor_encode_text_stringz(mapEncoder, "v");
+    cbor_encode_float(mapEncoder, (float)property);
 };
 
 template <>
-inline void ArduinoCloudProperty<bool>::appendValue(CborObject &cbor) {
-    cbor.set("vb", (int)property);
+inline void ArduinoCloudProperty<float>::appendValue(CborEncoder* mapEncoder) {
+    cbor_encode_text_stringz(mapEncoder, "v");
+    cbor_encode_float(mapEncoder, property);
 };
 
 template <>
-inline void ArduinoCloudProperty<float>::appendValue(CborObject &cbor) {
-    cbor.set("v", property);
+inline void ArduinoCloudProperty<bool>::appendValue(CborEncoder* mapEncoder) {
+    cbor_encode_text_stringz(mapEncoder, "vb");
+    cbor_encode_boolean(mapEncoder, property);
 };
-
-template <>
-inline void ArduinoCloudProperty<String>::appendValue(CborObject &cbor) {
-    cbor.set("vs", *property.c_str());
-};
-
 
 // Explicit compiler
 template class ArduinoCloudProperty<int>;
