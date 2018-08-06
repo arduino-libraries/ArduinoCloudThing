@@ -113,17 +113,17 @@ void ArduinoCloudProperty<T>::append(CborEncoder* encoder) {
     if (!canRead()) 
         return;
     
-    CborEncoder *mapEncoder;
-    cbor_encoder_create_map(encoder, mapEncoder, CborIndefiniteLength);
+    CborEncoder mapEncoder;
+    cbor_encoder_create_map(encoder, &mapEncoder, CborIndefiniteLength);
     if (tag != -1) {
-        cbor_encode_text_stringz(mapEncoder, "t");
-        cbor_encode_int(mapEncoder, tag);
+        cbor_encode_text_stringz(&mapEncoder, "t");
+        cbor_encode_int(&mapEncoder, tag);
     } else {
-        cbor_encode_text_stringz(mapEncoder, "n");
-        cbor_encode_text_stringz(mapEncoder, name.c_str());
+        cbor_encode_text_stringz(&mapEncoder, "n");
+        cbor_encode_text_stringz(&mapEncoder, name.c_str());
     }
-    appendValue(mapEncoder);
-    cbor_encoder_close_container(encoder, mapEncoder);
+    appendValue(&mapEncoder);
+    cbor_encoder_close_container(encoder, &mapEncoder);
     lastUpdated = millis();
 }
 

@@ -58,7 +58,7 @@ int ArduinoCloudThing::poll(uint8_t* data, size_t size) {
     if (diff > 0) {
         CborError err;
         CborEncoder encoder, arrayEncoder;
-        
+
         cbor_encoder_init(&encoder, data, size, 0);
         // create a cbor array containing the property that should be updated.
         err = cbor_encoder_create_array(&encoder, &arrayEncoder, CborIndefiniteLength);
@@ -71,17 +71,16 @@ int ArduinoCloudThing::poll(uint8_t* data, size_t size) {
             ArduinoCloudPropertyGeneric *p = list.get(i);
             // If a property should be updated and has read permission from the Cloud point of view
             if (p->shouldBeUpdated() && p->canRead()) {
-                // create a cbor object for the property and and add it into array
-                p->append(&encoder);
-
-                /*TODO
-                Manage buffer "overflow"
-                if (err && err != CborErrorOutOfMemory) {
-
-                }*/
+                // create a cbor object for the property and automatically add it into array
+                p->append(&arrayEncoder);
             }
         }
-        err = cbor_encoder_close_container_checked(&encoder, &arrayEncoder);
+
+        err = cbor_encoder_close_container(&encoder, &arrayEncoder);
+        if (err) {
+            Serial.println("Problem of CBOR encoding...\nNothing will be sent.");
+            Serial.println(cbor_error_string(err)); return 0;
+        }
 
         // update properties shadow values, in order to check if variable has changed since last publish
         for (int i = 0; i < list.size(); i++) {
@@ -90,6 +89,8 @@ int ArduinoCloudThing::poll(uint8_t* data, size_t size) {
         }
 
         // return the number of byte of the CBOR encoded array
+        //size_t dataSize = cbor_encoder_get_buffer_size(&encoder, data);
+        //Serial.print("-- Size of payload to send: "); Serial.println(dataSize);
         return cbor_encoder_get_buffer_size(&encoder, data);
     }
 
@@ -171,113 +172,216 @@ ArduinoCloudPropertyGeneric& ArduinoCloudThing::addPropertyReal(String& property
     return *(reinterpret_cast<ArduinoCloudPropertyGeneric*>(propertyObj));
 }
 
-
 void ArduinoCloudThing::decode(uint8_t *payload, size_t length) {
     
     CborType type;
     CborError err;
-    CborValue *it, *recursed, *recursedMap, *propValue;
+    CborParser parser;
+    CborValue it, recursedArray, recursedMap, propValue;
     int propId; String propType, propName;
     
-    // parse cbor data only if an array of cbor object is received.
-    if(cbor_value_get_type(it) != CborArrayType)
+    err = cbor_parser_init(payload, length, 0, &parser, &it);
+    if(err) {
+        Serial.println("Error in the parser creation.");
+        Serial.println(cbor_error_string(err));
         return;
-    
+    }
+
+    // parse cbor data only if an array of cbor object is received.
+    if(cbor_value_get_type(&it) != CborArrayType)
+        return;
+
     // enter in a cbor container, in this case, the array
-    err = cbor_value_enter_container(it, recursed);
+    err = cbor_value_enter_container(&it, &recursedArray);
     if (err) {
         Serial.println(cbor_error_string(err));
         return;
     }
 
-    // main loop through the cbor array elements
-    while (!cbor_value_at_end(it)) {
-        // if the current element is not a cbor object, ski it and go ahead.
-        if (cbor_value_get_type(it) != CborMapType)
-            continue;
+    // get array length
+    size_t len;
+    cbor_value_get_array_length(&recursedArray, &len);
+    Serial.print("Array size: "); Serial.println(len);
+
+    int arrayIndex = 0;
+    Serial.println("-- Decoding...");
+
+    while (!cbor_value_at_end(&recursedArray)) {
+    
+        CborType type = cbor_value_get_type(&recursedArray);
+        Serial.print("Element type: "); Serial.println(type);
         
-        // parse cbor object
-        err = cbor_value_enter_container(it, recursedMap);
-        if (!err) {
-            while (!cbor_value_at_end(it)) {
-                CborValue name;
-                cbor_value_map_find_value(it, "n", &name);
-                // check if a property has a name, of string type
-                if (name.type != CborTextStringType)
-                    break;
-                
-                // get the name
-                char *buf;
-                size_t n;
-                err = cbor_value_dup_text_string(it, &buf, &n, it);
-                if (err) {
-                    Serial.println("Cannot get name value of the property");
-                    break;     // parse error
+        if (type == CborMapType) {
+            Serial.println("Map element");
+            
+            err = cbor_value_enter_container(&recursedArray, &recursedMap);
+            if(err) {
+                Serial.println("Enter container.");
+                Serial.println(cbor_error_string(err));
+                return;
+            }
+
+            cbor_value_get_map_length(&recursedMap, &len);
+            Serial.print("Map size: "); Serial.println(len);
+            
+            while (!cbor_value_at_end(&recursedMap)) {
+
+                type = cbor_value_get_type(&recursedMap); 
+
+                if (type == CborTextStringType) {
+                    char *buf;
+                    size_t n;
+                    err = cbor_value_dup_text_string(&recursedMap, &buf, &n, &recursedMap);
+                   
+                    String val = String(buf);
+                    Serial.println(val);
+                    free(buf);
+                } else {
+                    cbor_value_advance(&recursedMap);
+                    Serial.println("Skip value.");
                 }
-                propName = String(buf);
-                free(buf);
+            }
 
-                // Search for the index of the device property with that name
-                propId = findPropertyByName(propName);
-                // If property does not exist, skip it and do nothing.
-                if (propId < 0) continue;
-                ArduinoCloudPropertyGeneric* property = list.get(propId);
-                Serial.print("-- Received prop name: "); Serial.println(property->getName());
+            Serial.println("END map scanning");
+            err = cbor_value_leave_container(&recursedArray, &recursedMap);
+            Serial.println("container leaved");
 
-                // Check for the property type, write method internally check for the permission
-                propType = property->getType();
+        } else {
+            Serial.println("Array element is NOT a map..");
+            cbor_value_advance(&recursedArray);
+        }
+        
+        Serial.println("Array index: "); Serial.println(++arrayIndex);
+    }
+    Serial.println("END array scanning");
 
-                if (propType == "INT" && !cbor_value_map_find_value(it, "v", propValue)) {
-                    // if no key proper key was found, do nothing
-                    if (name.type == CborIntegerType) {
-                        int val;
-                        cbor_value_get_int(it, &val);
-                        Serial.print("Received prop int value: "); Serial.println(val);
-                        ArduinoCloudProperty<int>* p = (ArduinoCloudProperty<int>*) property;
-                        p->write(val);
+}
+    /*
+
+    // main loop through the cbor array elements
+    while (!cbor_value_at_end(&it)) {
+            
+        // parse cbor object
+        err = cbor_value_enter_container(&it, &recursedMap);
+        if (!err) {
+
+            // if the current element is not a cbor object, skip it and go ahead.
+            CborType type = cbor_value_get_type(&recursedMap);
+            if (type != CborMapType) {
+                Serial.println("Array element is NOT a map..");
+                //continue;
+            } else {
+                Serial.println("Object into Array.....");
+                while (!cbor_value_at_end(&recursedMap)) {
+
+                    CborValue name;
+
+                    cbor_value_map_find_value(&recursedMap, "n", &name);
+                    Serial.println(name.type);
+
+                    // check if a property has a name, of string type
+                    if (name.type != CborTextStringType)
+                        break;
+
+                    // get the name
+                    char *buf; size_t n;
+
+                    err = cbor_value_dup_text_string(&name, &buf, &n, NULL);
+                    if (err) {
+                        Serial.println("Cannot get name value of the property");
+                        break;     // parse error
                     }
-                } else if (propType == "BOOL" && !cbor_value_map_find_value(it, "vb", propValue)) {
-                    if (name.type == CborBooleanType) {
-                        bool val;
-                        cbor_value_get_boolean(it, &val);
-                        Serial.print("Received prop bool value: "); Serial.println(val);
-                        ArduinoCloudProperty<bool>* p = (ArduinoCloudProperty<bool>*) property;
-                        p->write(val);
-                    }
-                } else if (propType == "FLOAT" && !cbor_value_map_find_value(it, "v", propValue)) { 
-                    if (name.type == CborFloatType) {
-                        float val;
-                        cbor_value_get_float(it, &val);
-                        Serial.print("Received prop float value: "); Serial.println(val);
-                        ArduinoCloudProperty<float>* p = (ArduinoCloudProperty<float>*) property;
-                        p->write(val);
-                    }
-                } else if (propType == "STRING" && !cbor_value_map_find_value(it, "vs", propValue)){ 
-                    if (name.type == CborBooleanType) {
-                        char *val; size_t n;
-                        err = cbor_value_dup_text_string(it, &buf, &n, it);
-                        if (err)
-                            Serial.println("Cannot get string value of the property");
-                        else {
-                            ArduinoCloudStringProperty* p = (ArduinoCloudStringProperty*) property;
-                            p->write(String(val));
-                            free(val);
+                    propName = String(buf);
+                    free(buf);
+
+                    // Search for the index of the device property with that name
+                    propId = findPropertyByName(propName);
+
+                    // If property does not exist, skip it and do nothing.
+                    if (propId < 0) continue;
+                    
+                    ArduinoCloudPropertyGeneric* property = list.get(propId);
+                    Serial.print("-- Received prop name: "); Serial.println(property->getName());
+
+                    // Check for the property type, write method internally check for the permission
+                    propType = property->getType();
+                    
+                    if (propType == "FLOAT" && !cbor_value_map_find_value(&recursedMap, "v", &propValue)) {
+                        
+                        Serial.print("Prop type: ");Serial.println(propValue.type);
+
+                        if (propValue.type == CborFloatType) {
+                            Serial.println("Float prop");
+                            float val;
+                            cbor_value_get_float(&propValue, &val);
+                            Serial.print("Received prop float value: "); Serial.println(val);
+                            ArduinoCloudProperty<float>* p = (ArduinoCloudProperty<float>*) property;
+                            p->write(val);
                         }
                     }
-                }
 
-                // If the property is changed call its callback
-                if (property->newData()) {
-                    if (property->callback != NULL) {
-                        property->callback();
-                    }
-                }   
+                    // If the property is changed call its callback
+                    if (property->newData()) {
+                        if (property->callback != NULL) {
+                            property->callback();
+                        }
+                    }   
+                }
             }
             // Leave the current cbor object
-            cbor_value_leave_container(it, recursedMap);
+            Serial.println("Leave map");
+            err = cbor_value_leave_container(&it, &recursedMap);
+            if(err) {
+                Serial.println("Cannot leave map");
+                Serial.println(cbor_error_string(err));
+            }
         }
     }
 
     // Leave the cbor array
-    cbor_value_leave_container(it, recursed);
+    cbor_value_leave_container(&it, &recursedArray);
 }
+
+
+
+
+/*
+                    if (propType == "INT" && !cbor_value_map_find_value(&it, "v", &propValue)) {
+                        // if no key proper key was found, do nothing
+                        if (name.type == CborIntegerType) {
+                            int val;
+                            cbor_value_get_int(&it, &val);
+                            Serial.print("Received prop int value: "); Serial.println(val);
+                            ArduinoCloudProperty<int>* p = (ArduinoCloudProperty<int>*) property;
+                            p->write(val);
+                        }
+                    } else if (propType == "BOOL" && !cbor_value_map_find_value(&it, "vb", &propValue)) {
+                        if (name.type == CborBooleanType) {
+                            bool val;
+                            cbor_value_get_boolean(&it, &val);
+                            Serial.print("Received prop bool value: "); Serial.println(val);
+                            ArduinoCloudProperty<bool>* p = (ArduinoCloudProperty<bool>*) property;
+                            p->write(val);
+                        }
+                    } else if (propType == "FLOAT" && !cbor_value_map_find_value(&it, "v", &propValue)) { 
+                        if (propValue.type == CborFloatType) {
+                            float val;
+                            cbor_value_get_float(&propValue, &val);
+                            Serial.print("Received prop float value: "); Serial.println(val);
+                            ArduinoCloudProperty<float>* p = (ArduinoCloudProperty<float>*) property;
+                            p->write(val);
+                        }
+                    } else if (propType == "STRING" && !cbor_value_map_find_value(&it, "vs", &propValue)){ 
+                        if (name.type == CborBooleanType) {
+                            uint8_t *val; size_t n;
+                            err = cbor_value_dup_byte_string(&it, &val, &n, &it);
+                            if (err)
+                                Serial.println("Cannot get string value of the property");
+                            else {
+                                ArduinoCloudStringProperty* p = (ArduinoCloudStringProperty*) property;
+                                p->write(String((char*)val));
+                                free(val);
+                            }
+                        }
+                    }
+                    */
