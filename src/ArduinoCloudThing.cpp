@@ -41,7 +41,6 @@ ArduinoCloudThing::ArduinoCloudThing() {
 
 
 void ArduinoCloudThing::begin() {
-
     status = ON;
     addPropertyReal(status, "status").readOnly();
 }
@@ -93,6 +92,16 @@ int ArduinoCloudThing::poll(uint8_t* data, size_t size) {
 #endif
     // If nothing has to be sent, return diff, that is 0 in this case
     return diff;
+}
+
+bool ArduinoCloudThing::hasAllReadProperties() {
+    for (int i = 0; i < list.size(); i++) {
+        ArduinoCloudPropertyGeneric *p = list.get(i);
+        // If at least 1 property has also WRITE permission, return false
+        if (p->getPermission() == READWRITE)
+            return false;
+    }
+    return true;
 }
 
 int ArduinoCloudThing::checkNewData() {
@@ -175,8 +184,8 @@ void ArduinoCloudThing::decode(uint8_t *payload, size_t length) {
 
     err = cbor_parser_init(payload, length, 0, &parser, &dataArray);
     if(err) {
-        Serial.println("Error in the parser creation.");
-        Serial.println(cbor_error_string(err));
+        //Serial.println("Error in the parser creation.");
+        //Serial.println(cbor_error_string(err));
         return;
     }
 

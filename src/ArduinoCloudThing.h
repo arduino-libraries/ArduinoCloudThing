@@ -36,6 +36,8 @@ public:
     // poll should return > 0 if something has changed
     int poll(uint8_t* data, size_t size);
     void decode(uint8_t * payload, size_t length);
+    // return true if a thing has all properties with READ permission
+    bool hasAllReadProperties();
 
 private:
     void update();
