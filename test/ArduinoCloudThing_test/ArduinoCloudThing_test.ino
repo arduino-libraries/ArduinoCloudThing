@@ -21,58 +21,69 @@ void loop()
 
 test(beginAddsStatusProperty)
 {
-  ArduinoCloudThing* thing = new ArduinoCloudThing();
-  thing->begin();
+  ArduinoCloudThing thing;
+  thing.begin();
   char buf[200];
   memset(buf, 0, 200);
-  thing->poll((uint8_t*)buf, 200);
+  thing.poll((uint8_t*)buf, 200);
 
   char expected[] = {0x9F, 0xBF, 0x61, 0x6E, 0x66, 0x73, 0x74, 0x61, 0x74, 0x75, 0x73, 0x61, 0x76, 0xF4, 0xFF, 0xFF, 0x0};
   assertEqual(expected, buf);
-  delete thing;
 }
 
 test(addThingAndChangeValue)
 {
-  ArduinoCloudThing* thing = new ArduinoCloudThing();
-  thing->begin();
+  ArduinoCloudThing thing;
+  thing.begin();
 
-  int test = 0;
+  int test_1 = 0;
   char buf[200];
   memset(buf, 0, 200);
 
-  thing->poll((uint8_t*)buf, 200);
-  thing->addPropertyReal(test, "test");
+  thing.addPropertyReal(test_1, "test").publishEvery(ON_CHANGE);
+  thing.poll((uint8_t*)buf, 200);
 
-  test = 6;
-  thing->poll((uint8_t*)buf, 200);
+  memset(buf, 0, 200);
 
-  char expected[] = {0x9F, 0xBF, 0x61, 0x6E, 0x64, 0x74, 0x65, 0x73, 0x74, 0x61, 0x76, 0x6, 0xFF, 0xFF, 0xFF, 0xFF, 0x0};
+  test_1 = 6;
+  thing.poll((uint8_t*)buf, 200);
+
+  char expected[] = {0x9F, 0xBF, 0x61, 0x6E, 0x64, 0x74, 0x65, 0x73, 0x74, 0x61, 0x76, 0x6, 0xFF, 0xFF, 0x0};
   assertEqual(expected, buf);
 
-  test = 7;
-  thing->poll((uint8_t*)buf, 200);
+  test_1 = 7;
+  thing.poll((uint8_t*)buf, 200);
 
-  char expected2[] = {0x9F, 0xBF, 0x61, 0x6E, 0x64, 0x74, 0x65, 0x73, 0x74, 0x61, 0x76, 0x7, 0xFF, 0xFF, 0xFF, 0xFF, 0x0};
+  char expected2[] = {0x9F, 0xBF, 0x61, 0x6E, 0x64, 0x74, 0x65, 0x73, 0x74, 0x61, 0x76, 0x7, 0xFF, 0xFF, 0x0};
   assertEqual(expected2, buf);
-
-  delete thing;
 }
 
 test(decodeBuffer)
 {
-  ArduinoCloudThing* thing = new ArduinoCloudThing();
-  thing->begin();
+  ArduinoCloudThing thing;
+  thing.begin();
 
-  int test = 0;
-  thing->addPropertyReal(test, "test");
+  int test_1 = 0;
+  thing.addPropertyReal(test_1, "test");
 
-  char buf[] = {0x9F, 0xBF, 0x61, 0x6E, 0x64, 0x74, 0x65, 0x73, 0x74, 0x61, 0x76, 0x7, 0xFF, 0xFF, 0xFF, 0xFF, 0x0};
-  thing->decode((uint8_t*)buf, sizeof(buf));
+  char buf[] = {0x9F, 0xBF, 0x61, 0x6E, 0x64, 0x74, 0x65, 0x73, 0x74, 0x61, 0x76, 0x7, 0xFF, 0xFF, 0x0};
+  thing.decode((uint8_t*)buf, sizeof(buf));
 
-  assertEqual(test, 7);
+  assertEqual(test_1, 7);
+}
 
-  delete thing;
+test(decodeBufferShouldnUpdateIfReadonly)
+{
+  ArduinoCloudThing thing;
+  thing.begin();
+
+  int test_1 = 0;
+  thing.addPropertyReal(test_1, "test").readOnly();
+
+  char buf[] = {0x9F, 0xBF, 0x61, 0x6E, 0x64, 0x74, 0x65, 0x73, 0x74, 0x61, 0x76, 0x7, 0xFF, 0xFF, 0x0};
+  thing.decode((uint8_t*)buf, sizeof(buf));
+
+  assertEqual(test_1, 0);
 }
 
 /*
