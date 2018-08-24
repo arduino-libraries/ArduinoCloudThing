@@ -178,3 +178,19 @@ test(reportEvery)
   ret = thing.poll((uint8_t*)buf, 200);
   assertNotEqual(ret, 0);
 }
+
+test(writeOnly)
+{
+  ArduinoCloudThing thing;
+  thing.begin();
+
+  uint8_t buf[200];
+  thing.poll((uint8_t*)buf, 200);
+
+  int test_1 = 10;
+
+  thing.addPropertyReal(test_1, "test_1").writeOnly();
+  int ret = thing.poll((uint8_t*)buf, 200);
+
+  assertEqual(ret, 0);
+}
