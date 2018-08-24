@@ -218,3 +218,24 @@ test(callback)
 
   assertEqual(globalVal, 0xAA);
 }
+
+test(minimumDelta)
+{
+  ArduinoCloudThing thing;
+  thing.begin();
+
+  uint8_t buf[200];
+  int test_1 = 10;
+  int delta = 6;
+
+  thing.addPropertyReal(test_1, "test").minimumDelta(&delta);
+  thing.poll((uint8_t*)buf, 200);
+
+  test_1 += 4;
+  int ret = thing.poll((uint8_t*)buf, 200);
+  assertEqual(ret, 0);
+
+  test_1 += 4;
+  ret = thing.poll((uint8_t*)buf, 200);
+  assertNotEqual(ret, 0);
+}
