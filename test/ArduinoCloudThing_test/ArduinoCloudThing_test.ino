@@ -194,3 +194,27 @@ test(writeOnly)
 
   assertEqual(ret, 0);
 }
+
+static int globalVal = 0;
+void externalCallback() {
+  globalVal = 0xAA;
+}
+
+test(callback)
+{
+  ArduinoCloudThing thing;
+  thing.begin();
+
+  uint8_t buf[200];
+  thing.poll((uint8_t*)buf, 200);
+
+  int test_1 = 10;
+
+  thing.addPropertyReal(test_1, "test").onUpdate(externalCallback);
+
+  globalVal = 0;
+  unsigned char expected[] = {0x9F, 0xBF, 0x61, 0x6E, 0x64, 0x74, 0x65, 0x73, 0x74, 0x61, 0x76, 0x6, 0xFF, 0xFF, 0x0};
+  thing.decode(expected, sizeof(expected));
+
+  assertEqual(globalVal, 0xAA);
+}
