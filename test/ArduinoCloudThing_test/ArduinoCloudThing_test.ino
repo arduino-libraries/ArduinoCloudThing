@@ -157,3 +157,24 @@ test(createaManyProperties)
 
   assertEqual(ret, 85);
 }
+
+
+test(reportEvery)
+{
+  ArduinoCloudThing thing;
+  thing.begin();
+
+  uint8_t buf[200];
+
+  int test_1 = 10;
+
+  thing.addPropertyReal(test_1, "test_1").publishEvery(1 * SECONDS);
+  int ret = thing.poll((uint8_t*)buf, 200);
+
+  ret = thing.poll((uint8_t*)buf, 200);
+  assertEqual(ret, 0);
+
+  delay(2000);
+  ret = thing.poll((uint8_t*)buf, 200);
+  assertNotEqual(ret, 0);
+}
