@@ -22,6 +22,12 @@ void setup()
 void loop()
 {
   Test::run();
+
+#if defined(ARDUINO_ARCH_MRAA)
+  if (Test::remaining() == 0) {
+    exit(Test::getCurrentFailed());
+  }
+#endif
 }
 
 test(beginAddsStatusProperty)
