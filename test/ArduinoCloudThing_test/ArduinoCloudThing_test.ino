@@ -51,7 +51,7 @@ test(addThingAndChangeValue)
   unsigned char buf[200];
   memset(buf, 0, 200);
 
-  thing.addPropertyReal(test_1, "test").publishEvery(ON_CHANGE);
+  thing.addPropertyReal(test_1, "test", READWRITE, ON_CHANGE);
   thing.poll((uint8_t*)buf, 200);
 
   memset(buf, 0, 200);
@@ -99,7 +99,7 @@ test(decodeBufferShouldnUpdateIfReadonly)
   thing.begin();
 
   int test_1 = 0;
-  thing.addPropertyReal(test_1, "test").readOnly();
+  thing.addPropertyReal(test_1, "test", READ);
 
   unsigned char buf[] = {0x81, 0xA2, 0x61, 0x6E, 0x64, 0x74, 0x65, 0x73, 0x74, 0x61, 0x76, 0x7, 0x0};
   thing.decode((uint8_t*)buf, sizeof(buf));
@@ -121,7 +121,7 @@ test(intAndFloatDiffer)
 
 
   float test_2 = 10.0f;
-  thing.addPropertyReal(test_2, "test");
+  //thing.addPropertyReal(test_2, "test");
   thing.poll((uint8_t*)buf, 200);
 
   assertNotEqual((char*)buf, (char*)buf2);
@@ -165,7 +165,7 @@ test(createaManyProperties)
   bool stuff = false;
   String otherStuff = "weyyyy";
 
-  thing.addPropertyReal(test_2, "test_2");
+  //thing.addPropertyReal(test_2, "test_2");
   thing.addPropertyReal(stuff, "stuff");
   thing.addPropertyReal(test_1, "test_1");
   thing.addPropertyReal(otherStuff, "otherStuff");
@@ -195,7 +195,7 @@ test(reportEvery)
 
   int test_1 = 10;
 
-  thing.addPropertyReal(test_1, "test_1").publishEvery(1 * SECONDS);
+  thing.addPropertyReal(test_1, "test_1", READWRITE, 1 * SECONDS);
   int ret = thing.poll((uint8_t*)buf, 200);
 
   ret = thing.poll((uint8_t*)buf, 200);
@@ -216,7 +216,7 @@ test(writeOnly)
 
   int test_1 = 10;
 
-  thing.addPropertyReal(test_1, "test_1").writeOnly();
+  thing.addPropertyReal(test_1, "test_1", WRITE);
   int ret = thing.poll((uint8_t*)buf, 200);
 
   assertEqual(ret, 0);
@@ -237,7 +237,7 @@ test(callback)
 
   int test_1 = 10;
 
-  thing.addPropertyReal(test_1, "test").onUpdate(externalCallback);
+  thing.addPropertyReal(test_1, "test", READWRITE, ON_CHANGE, externalCallback);
 
   globalVal = 0;
   unsigned char expected[] = {0x9F, 0xBF, 0x61, 0x6E, 0x64, 0x74, 0x65, 0x73, 0x74, 0x61, 0x76, 0x6, 0xFF, 0xFF, 0x0};
@@ -255,7 +255,7 @@ test(minimumDelta)
   int test_1 = 10;
   int delta = 6;
 
-  thing.addPropertyReal(test_1, "test").minimumDelta(&delta);
+  thing.addPropertyReal(test_1, "test", READWRITE, ON_CHANGE, NULL, delta);
   thing.poll((uint8_t*)buf, 200);
 
   test_1 += 4;
