@@ -121,7 +121,7 @@ test(intAndFloatDiffer)
 
 
   float test_2 = 10.0f;
-  //thing.addPropertyReal(test_2, "test");
+  thing.addPropertyReal(test_2, "test");
   thing.poll((uint8_t*)buf, 200);
 
   assertNotEqual((char*)buf, (char*)buf2);
@@ -165,7 +165,7 @@ test(createaManyProperties)
   bool stuff = false;
   String otherStuff = "weyyyy";
 
-  //thing.addPropertyReal(test_2, "test_2");
+  thing.addPropertyReal(test_2, "test_2");
   thing.addPropertyReal(stuff, "stuff");
   thing.addPropertyReal(test_1, "test_1");
   thing.addPropertyReal(otherStuff, "otherStuff");
