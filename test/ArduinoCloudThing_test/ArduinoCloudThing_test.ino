@@ -107,6 +107,20 @@ test(decodeBufferShouldnUpdateIfReadonly)
   assertEqual(test_1, 0);
 }
 
+test(decodeShouldNotHang)
+{
+  ArduinoCloudThing thing;
+  thing.begin();
+
+  int test_1 = 0;
+  thing.addPropertyReal(test_1, "test", READ);
+
+  unsigned char buf[] = {0x81, 0xff, 0xA2, 0x61, 0x6E, 0x64, 0x74, 0x65, 0x73, 0x74, 0x61, 0x76, 0x7, 0x0};
+  thing.decode((uint8_t*)buf, sizeof(buf));
+
+  assertEqual(test_1, 0);
+}
+
 test(intAndFloatDiffer)
 {
   ArduinoCloudThing thing;
