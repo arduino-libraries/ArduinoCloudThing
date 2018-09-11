@@ -29,8 +29,8 @@ void loop()
   }
 #endif
 }
-
-test(beginAddsStatusProperty)
+/*
+test(beginAddStatusProperty)
 {
   ArduinoCloudThing thing;
   thing.begin();
@@ -41,7 +41,7 @@ test(beginAddsStatusProperty)
   unsigned char expected[] = {0x81, 0xA2, 0x61, 0x6E, 0x66, 0x73, 0x74, 0x61, 0x74, 0x75, 0x73, 0x61, 0x76, 0xF4, 0x0};
   assertEqual((char*)expected, (char*)buf);
 }
-
+*/
 test(addThingAndChangeValue)
 {
   ArduinoCloudThing thing;
@@ -57,25 +57,28 @@ test(addThingAndChangeValue)
   memset(buf, 0, 200);
 
   test_1 = 6;
-  thing.poll((uint8_t*)buf, 200);
+  int ret = thing.poll((uint8_t*)buf, 200);
 
 #if 0
   for (int i = 0; buf[i] != 0; i++) {
     if (buf[i] < 16) {
       Serial.print("0");
     }
-    Serial.print(buf[i] , HEX);
+    Serial.println(buf[i] , HEX);
   }
   Serial.println();
 #endif
 
-  unsigned char expected[] = {0x81, 0xA2, 0x61, 0x6E, 0x64, 0x74, 0x65, 0x73, 0x74, 0x61, 0x76, 0x6, 0x0};
+  unsigned const char expected[] = {0x81, 0xBF, 0x61, 0x6E, 0x64, 0x74, 0x65, 0x73, 0x74, 0x61, 0x76, 0x06, 0xFF, 0x00};
+  // 13 is the lenght that this array must have ( 1 element array, containing indefinite lenght map)
+  assertEqual(ret, 13);
   assertEqual((char*)expected, (char*)buf);
 
   test_1 = 7;
-  thing.poll((uint8_t*)buf, 200);
+  ret = thing.poll((uint8_t*)buf, 200);
 
-  unsigned char expected2[] = {0x81, 0xA2, 0x61, 0x6E, 0x64, 0x74, 0x65, 0x73, 0x74, 0x61, 0x76, 0x7, 0x0};
+  unsigned char expected2[] = {0x81, 0xBF, 0x61, 0x6E, 0x64, 0x74, 0x65, 0x73, 0x74, 0x61, 0x76, 0x07, 0xFF, 0x00};
+  assertEqual(ret, 13);
   assertEqual((char*)expected2, (char*)buf);
 }
 
@@ -187,7 +190,7 @@ test(createaManyProperties)
   int ret = thing.poll((uint8_t*)buf, 200);
 
 #if 0
-  for (int i = 0; i < 85; i++) {
+  for (int i = 0; i < ret; i++) {
     if (buf[i] < 16) {
       Serial.print("0");
     }
@@ -196,7 +199,8 @@ test(createaManyProperties)
   Serial.println();
 #endif
 
-  assertEqual(ret, 79);
+
+  assertEqual(ret, 87);
 }
 
 
