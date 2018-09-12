@@ -29,19 +29,22 @@ void loop()
   }
 #endif
 }
+
 /*
+  ENCODE TEST
+*/
 test(beginAddStatusProperty)
 {
   ArduinoCloudThing thing;
   thing.begin();
   unsigned char buf[200];
   memset(buf, 0, 200);
-  thing.poll((uint8_t*)buf, 200);
+  int ret = thing.poll((uint8_t*)buf, 200);
 
-  unsigned char expected[] = {0x81, 0xA2, 0x61, 0x6E, 0x66, 0x73, 0x74, 0x61, 0x74, 0x75, 0x73, 0x61, 0x76, 0xF4, 0x0};
+  unsigned char expected[] = {0x81, 0xBF, 0x61, 0x6E, 0x66, 0x73, 0x74, 0x61, 0x74, 0x75, 0x73, 0x62, 0x76, 0x62, 0xF5, 0xFF, 0x0};
   assertEqual((char*)expected, (char*)buf);
 }
-*/
+
 test(addThingAndChangeValue)
 {
   ArduinoCloudThing thing;
@@ -59,16 +62,6 @@ test(addThingAndChangeValue)
   test_1 = 6;
   int ret = thing.poll((uint8_t*)buf, 200);
 
-#if 0
-  for (int i = 0; buf[i] != 0; i++) {
-    if (buf[i] < 16) {
-      Serial.print("0");
-    }
-    Serial.println(buf[i] , HEX);
-  }
-  Serial.println();
-#endif
-
   unsigned const char expected[] = {0x81, 0xBF, 0x61, 0x6E, 0x64, 0x74, 0x65, 0x73, 0x74, 0x61, 0x76, 0x06, 0xFF, 0x00};
   // 13 is the lenght that this array must have ( 1 element array, containing indefinite lenght map)
   assertEqual(ret, 13);
@@ -82,6 +75,10 @@ test(addThingAndChangeValue)
   assertEqual((char*)expected2, (char*)buf);
 }
 
+
+/*
+  DECODE TESTS
+*/
 test(decodeBuffer)
 {
   ArduinoCloudThing thing;
@@ -110,6 +107,43 @@ test(decodeBufferShouldnUpdateIfReadonly)
   assertEqual(test_1, 0);
 }
 
+test(shouldNotDecode)
+{
+  ArduinoCloudThing thing;
+  thing.begin();
+
+  float test = 3.14159268;
+  thing.addPropertyReal(test, "test");
+
+  // received CBOR is a float value
+  unsigned char buf_1[] = {0xFB, 0x40, 0x03, 0xCB, 0xCC, 0xF2, 0x8C, 0x79, 0xF6, 0x0};
+  thing.decode((uint8_t*)buf_1, sizeof(buf_1));
+  assertNear(test, 3.14, 0.01);
+  
+  // received CBOR is an map and not an array
+  unsigned char buf_2[] = {0xBF, 0x61, 0x6E, 0x64, 0x74, 0x65, 0x73, 0x74, 0x61, 0x76, 0xFB, 0x40, 0x03, 0xCB, 0xCC, 0xF2, 0x8C, 0x79, 0xF6, 0xFF, 0x0};
+  thing.decode((uint8_t*)buf_2, sizeof(buf_2));
+  assertNear(test, 3.14, 0.01);
+  
+  // recived CBOR is an array of values
+  unsigned char buf_3[] = {0x84, 0xFB, 0x40, 0x03, 0xCB, 0xCC, 0xF2, 0x8C, 0x79, 0xF6, 0x0A, 0xF5, 0x64, 0x63, 0x69, 0x61, 0x6F, 0x0};
+  thing.decode((uint8_t*)buf_3, sizeof(buf_3));
+  assertNear(test, 3.14, 0.01);
+
+/*
+  // recived CBOR is an array of values with a correct map
+  unsigned char buf_4[] = {0x84, 0x0A, 0xF5, 0xA2, 0x61, 0x6E, 0x64, 0x74, 0x65, 0x73, 0x74, 0x61, 0x76, 0xFB, 0x40, 0x03, 0xCB, 0xCC, 0xF2, 0x8C, 0x79, 0xF6, 0x64, 0x63, 0x69, 0x61, 0x6F, 0xFF, 0x0};
+  thing.decode((uint8_t*)buf_4, sizeof(buf_4));
+  assertNotEqual(test, 2.474512);
+*/
+
+  unsigned char buf_4[] = {0x81, 0xA2, 0x61, 0x6E, 0x64, 0x74, 0x65, 0x73, 0x74, 0x61, 0x76, 0xFB, 0x40, 0x03, 0xCB, 0xCC, 0xF2, 0x8C, 0x79, 0xF6, 0x0};
+  thing.decode((uint8_t*)buf_4, sizeof(buf_4));
+  assertNear(test, 2.47, 0.01);
+
+}
+
+/*
 test(decodeShouldNotHang)
 {
   ArduinoCloudThing thing;
@@ -118,12 +152,19 @@ test(decodeShouldNotHang)
   int test_1 = 0;
   thing.addPropertyReal(test_1, "test", READ);
 
+  Serial.println("Added property");
+
+
   unsigned char buf[] = {0x81, 0xff, 0xA2, 0x61, 0x6E, 0x64, 0x74, 0x65, 0x73, 0x74, 0x61, 0x76, 0x7, 0x0};
   thing.decode((uint8_t*)buf, sizeof(buf));
 
+  Serial.println("Decoded");
+
   assertEqual(test_1, 0);
 }
+*/
 
+/* DATA TYPES TESTS */
 test(intAndFloatDiffer)
 {
   ArduinoCloudThing thing;
@@ -155,15 +196,14 @@ test(stringProperty)
   String s = "test";
   thing.addPropertyReal(s, "test");
   memset(buf, 0, 200);
+  int ret = thing.poll((uint8_t*)buf, 200);
 
-  thing.poll((uint8_t*)buf, 200);
-
-  unsigned char expected[] = {0x81, 0xA2, 0x61, 0x6E, 0x64, 0x74, 0x65, 0x73, 0x74, 0x61, 0x76, 0x64, 0x74, 0x65, 0x73, 0x74, 0x0};
+  unsigned char expected[] = {0x81, 0xBF, 0x61, 0x6E, 0x64, 0x74, 0x65, 0x73, 0x74, 0x62, 0x76, 0x73, 0x64, 0x74, 0x65, 0x73, 0x74, 0xFF, 0x0};
   thing.decode((uint8_t*)buf, sizeof(buf));
 
   assertEqual((char*)buf, (char*)expected);
 
-  unsigned char newstring[] = {0x9F, 0xBF, 0x61, 0x6E, 0x64, 0x74, 0x65, 0x73, 0x74, 0x61, 0x76, 0x66, 0x74, 0x65, 0x73, 0x74, 0x74, 0x74, 0xFF, 0xFF, 0x0};
+  unsigned char newstring[] = {0x9F, 0xBF, 0x61, 0x6E, 0x64, 0x74, 0x65, 0x73, 0x74, 0x62, 0x76, 0x73, 0x66, 0x74, 0x65, 0x73, 0x74, 0x74, 0x74, 0xFF, 0xFF, 0x0};
   thing.decode((uint8_t*)newstring, sizeof(newstring));
 
   assertEqual(s, "testtt");
@@ -188,22 +228,12 @@ test(createaManyProperties)
   thing.addPropertyReal(otherStuff, "otherStuff");
 
   int ret = thing.poll((uint8_t*)buf, 200);
-
-#if 0
-  for (int i = 0; i < ret; i++) {
-    if (buf[i] < 16) {
-      Serial.print("0");
-    }
-    Serial.print(buf[i] , HEX);
-  }
-  Serial.println();
-#endif
-
-
   assertEqual(ret, 87);
 }
 
-
+/* 
+  PROPERTIES BUSINESS LOGIC TESTS 
+*/
 test(reportEvery)
 {
   ArduinoCloudThing thing;
