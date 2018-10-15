@@ -56,7 +56,7 @@ test(addThingAndChangeValue)
   unsigned char buf[200];
   memset(buf, 0, 200);
 
-  thing.addPropertyReal(test_1, "test", READWRITE, ON_CHANGE);
+  thing.addProperty(test_1, "test", Permission::ReadWrite);
   thing.poll((uint8_t*)buf, 200);
 
   memset(buf, 0, 200);
@@ -87,7 +87,7 @@ test(decodeBuffer)
   thing.begin();
 
   int test_1 = 0;
-  thing.addPropertyReal(test_1, "test");
+  thing.addProperty(test_1, "test", Permission::ReadWrite);
 
   unsigned char buf[] = {0x81, 0xA2, 0x61, 0x6E, 0x64, 0x74, 0x65, 0x73, 0x74, 0x61, 0x76, 0x7, 0x0};
   thing.decode((uint8_t*)buf, sizeof(buf));
@@ -105,11 +105,11 @@ test(decodeProperties) {
   bool test_bool = false;
   String test_string = "xxx";
 
-  thing.addPropertyReal(test_uint, "test_uint");
-  thing.addPropertyReal(test_sint, "test_sint");
-  thing.addPropertyReal(test_float, "test_float");
-  thing.addPropertyReal(test_bool, "test_bool");
-  thing.addPropertyReal(test_string, "test_string");
+  thing.addProperty(test_uint, "test_uint", Permission::ReadWrite);
+  thing.addProperty(test_sint, "test_sint", Permission::ReadWrite);
+  thing.addProperty(test_float, "test_float", Permission::ReadWrite);
+  thing.addProperty(test_bool, "test_bool", Permission::ReadWrite);
+  thing.addProperty(test_string, "test_string", Permission::ReadWrite);
 
   unsigned char buf[] = {0x86,0xA3,0x62,0x62,0x74,0x1A,0x5B,0x98,0xD7,0x80,0x61,0x6E,0x69,0x74,0x65,0x73,0x74,0x5F,0x75,0x69,0x6E,0x74,0x61,0x76,0x04,0xA3,0x62,0x62,0x74,0x1A,0x5B,0x98,0xD7,0x80,0x61,0x6E,0x69,0x74,0x65,0x73,0x74,0x5F,0x73,0x69,0x6E,0x74,0x61,0x76,0x23,0xA3,0x62,0x62,0x74,0x1A,0x5B,0x98,0xD7,0x80,0x61,0x6E,0x6A,0x74,0x65,0x73,0x74,0x5F,0x66,0x6C,0x6F,0x61,0x74,0x61,0x76,0xFB,0x40,0x12,0x00,0x00,0x00,0x00,0x00,0x00,0xA3,0x62,0x62,0x74,0x1A,0x5B,0x98,0xD7,0x80,0x61,0x6E,0x6B,0x74,0x65,0x73,0x74,0x5F,0x73,0x74,0x72,0x69,0x6E,0x67,0x62,0x76,0x73,0x6A,0x74,0x65,0x73,0x74,0x20,0x76,0x61,0x6C,0x75,0x65,0xA3,0x62,0x62,0x74,0x1A,0x5B,0x98,0xD7,0x80,0x61,0x6E,0x69,0x74,0x65,0x73,0x74,0x5F,0x62,0x6F,0x6F,0x6C,0x62,0x76,0x62,0xF5,0xA3,0x62,0x62,0x74,0x1A,0x5B,0x98,0xD7,0x80,0x61,0x6E,0x6B,0x74,0x65,0x73,0x74,0x5F,0x64,0x6F,0x75,0x62,0x6C,0x65,0x61,0x76,0xFB,0x7F,0xEF,0xFF,0xFC,0x57,0xCA,0x82,0xAE,0x00};
   thing.decode((uint8_t*)buf, sizeof(buf));
@@ -127,7 +127,7 @@ test(decodeBufferShouldnUpdateIfReadonly)
   thing.begin();
 
   int test_1 = 0;
-  thing.addPropertyReal(test_1, "test", READ);
+  thing.addProperty(test_1, "test", Permission::Read);
 
   unsigned char buf[] = {0x81, 0xA2, 0x61, 0x6E, 0x64, 0x74, 0x65, 0x73, 0x74, 0x61, 0x76, 0x7, 0x0};
   thing.decode((uint8_t*)buf, sizeof(buf));
@@ -141,18 +141,18 @@ test(shouldNotDecode)
   thing.begin();
 
   float test = 3.14159268;
-  thing.addPropertyReal(test, "test");
+  thing.addProperty(test, "test", Permission::ReadWrite);
 
   // received CBOR is a float value
   unsigned char buf_1[] = {0xFB, 0x40, 0x03, 0xCB, 0xCC, 0xF2, 0x8C, 0x79, 0xF6, 0x0};
   thing.decode((uint8_t*)buf_1, sizeof(buf_1));
   assertNear(test, 3.14, 0.01);
-  
+
   // received CBOR is an map and not an array
   unsigned char buf_2[] = {0xBF, 0x61, 0x6E, 0x64, 0x74, 0x65, 0x73, 0x74, 0x61, 0x76, 0xFB, 0x40, 0x03, 0xCB, 0xCC, 0xF2, 0x8C, 0x79, 0xF6, 0xFF, 0x0};
   thing.decode((uint8_t*)buf_2, sizeof(buf_2));
   assertNear(test, 3.14, 0.01);
-  
+
   // recived CBOR is an array of values
   unsigned char buf_3[] = {0x84, 0xFB, 0x40, 0x03, 0xCB, 0xCC, 0xF2, 0x8C, 0x79, 0xF6, 0x0A, 0xF5, 0x64, 0x63, 0x69, 0x61, 0x6F, 0x0};
   thing.decode((uint8_t*)buf_3, sizeof(buf_3));
@@ -178,7 +178,7 @@ test(decodeShouldNotHang)
   thing.begin();
 
   int test_1 = 0;
-  thing.addPropertyReal(test_1, "test", READ);
+  thing.addProperty(test_1, "test", Permission::Read);
 
   unsigned char buf_1[] = {0x81, 0xff, 0xA2, 0x61, 0x6E, 0x64, 0x74, 0x65, 0x73, 0x74, 0x61, 0x76, 0x7, 0x0};
   thing.decode((uint8_t*)buf_1, sizeof(buf_1));
@@ -205,12 +205,12 @@ test(intAndFloatDiffer)
   uint8_t buf2[200];
 
   int test_1 = 10;
-  thing.addPropertyReal(test_1, "test");
+  thing.addProperty(test_1, "test", Permission::ReadWrite);
   thing.poll((uint8_t*)buf, 200);
 
 
   float test_2 = 10.0f;
-  thing.addPropertyReal(test_2, "test");
+  thing.addProperty(test_2, "test", Permission::ReadWrite);
   thing.poll((uint8_t*)buf, 200);
 
   assertNotEqual((char*)buf, (char*)buf2);
@@ -225,7 +225,7 @@ test(stringProperty)
   thing.poll((uint8_t*)buf, 200);
 
   String s = "test";
-  thing.addPropertyReal(s, "test");
+  thing.addProperty(s, "test", Permission::ReadWrite);
   memset(buf, 0, 200);
   int ret = thing.poll((uint8_t*)buf, 200);
 
@@ -253,17 +253,17 @@ test(createaManyProperties)
   bool stuff = false;
   String otherStuff = "weyyyy";
 
-  thing.addPropertyReal(test_2, "test_2");
-  thing.addPropertyReal(stuff, "stuff");
-  thing.addPropertyReal(test_1, "test_1");
-  thing.addPropertyReal(otherStuff, "otherStuff");
+  thing.addProperty(test_2, "test_2", Permission::ReadWrite);
+  thing.addProperty(stuff, "stuff", Permission::ReadWrite);
+  thing.addProperty(test_1, "test_1", Permission::ReadWrite);
+  thing.addProperty(otherStuff, "otherStuff", Permission::ReadWrite);
 
   int ret = thing.poll((uint8_t*)buf, 200);
   assertEqual(ret, 87);
 }
 
-/* 
-  PROPERTIES BUSINESS LOGIC TESTS 
+/*
+  PROPERTIES BUSINESS LOGIC TESTS
 */
 test(reportEvery)
 {
@@ -274,7 +274,7 @@ test(reportEvery)
 
   int test_1 = 10;
 
-  thing.addPropertyReal(test_1, "test_1", READWRITE, 1 * SECONDS);
+  thing.addProperty(test_1, "test_1", Permission::ReadWrite).publishEvery(1 * SECONDS);
   int ret = thing.poll((uint8_t*)buf, 200);
 
   ret = thing.poll((uint8_t*)buf, 200);
@@ -295,7 +295,7 @@ test(writeOnly)
 
   int test_1 = 10;
 
-  thing.addPropertyReal(test_1, "test_1", WRITE);
+  thing.addProperty(test_1, "test_1", Permission::Write);
   int ret = thing.poll((uint8_t*)buf, 200);
 
   assertEqual(ret, 0);
@@ -316,7 +316,7 @@ test(callback)
 
   int test_1 = 10;
 
-  thing.addPropertyReal(test_1, "test", READWRITE, ON_CHANGE, externalCallback);
+  thing.addProperty(test_1, "test", Permission::ReadWrite).onUpdate(externalCallback);
 
   globalVal = 0;
   unsigned char expected[] = {0x9F, 0xBF, 0x61, 0x6E, 0x64, 0x74, 0x65, 0x73, 0x74, 0x61, 0x76, 0x6, 0xFF, 0xFF, 0x0};
@@ -334,7 +334,7 @@ test(minimumDelta)
   int test_1 = 10;
   int delta = 6;
 
-  thing.addPropertyReal(test_1, "test", READWRITE, ON_CHANGE, NULL, delta);
+  thing.addProperty(test_1, "test", Permission::ReadWrite).publishOnChange(delta);
   thing.poll((uint8_t*)buf, 200);
 
   test_1 += 4;
