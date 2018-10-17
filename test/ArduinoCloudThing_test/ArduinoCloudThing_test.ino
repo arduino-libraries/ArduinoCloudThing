@@ -41,7 +41,7 @@ test(beginAddStatusProperty)
   thing.begin();
   unsigned char buf[200];
   memset(buf, 0, 200);
-  int ret = thing.poll((uint8_t*)buf, 200);
+  int ret = thing.encode((uint8_t*)buf, 200);
 
   unsigned char expected[] = {0x81, 0xBF, 0x61, 0x6E, 0x66, 0x73, 0x74, 0x61, 0x74, 0x75, 0x73, 0x62, 0x76, 0x62, 0xF5, 0xFF, 0x0};
   assertEqual((char*)expected, (char*)buf);
@@ -57,12 +57,12 @@ test(addThingAndChangeValue)
   memset(buf, 0, 200);
 
   thing.addProperty(test_1, "test", Permission::ReadWrite);
-  thing.poll((uint8_t*)buf, 200);
+  thing.encode((uint8_t*)buf, 200);
 
   memset(buf, 0, 200);
 
   test_1 = 6;
-  int ret = thing.poll((uint8_t*)buf, 200);
+  int ret = thing.encode((uint8_t*)buf, 200);
 
   unsigned const char expected[] = {0x81, 0xBF, 0x61, 0x6E, 0x64, 0x74, 0x65, 0x73, 0x74, 0x61, 0x76, 0x06, 0xFF, 0x00};
   // 13 is the lenght that this array must have ( 1 element array, containing indefinite lenght map)
@@ -70,7 +70,7 @@ test(addThingAndChangeValue)
   assertEqual((char*)expected, (char*)buf);
 
   test_1 = 7;
-  ret = thing.poll((uint8_t*)buf, 200);
+  ret = thing.encode((uint8_t*)buf, 200);
 
   unsigned char expected2[] = {0x81, 0xBF, 0x61, 0x6E, 0x64, 0x74, 0x65, 0x73, 0x74, 0x61, 0x76, 0x07, 0xFF, 0x00};
   assertEqual(ret, 13);
@@ -206,12 +206,12 @@ test(intAndFloatDiffer)
 
   int test_1 = 10;
   thing.addProperty(test_1, "test", Permission::ReadWrite);
-  thing.poll((uint8_t*)buf, 200);
+  thing.encode((uint8_t*)buf, 200);
 
 
   float test_2 = 10.0f;
   thing.addProperty(test_2, "test", Permission::ReadWrite);
-  thing.poll((uint8_t*)buf, 200);
+  thing.encode((uint8_t*)buf, 200);
 
   assertNotEqual((char*)buf, (char*)buf2);
 }
@@ -222,12 +222,12 @@ test(stringProperty)
   thing.begin();
 
   uint8_t buf[200];
-  thing.poll((uint8_t*)buf, 200);
+  thing.encode((uint8_t*)buf, 200);
 
   String s = "test";
   thing.addProperty(s, "test", Permission::ReadWrite);
   memset(buf, 0, 200);
-  int ret = thing.poll((uint8_t*)buf, 200);
+  int ret = thing.encode((uint8_t*)buf, 200);
 
   unsigned char expected[] = {0x81, 0xBF, 0x61, 0x6E, 0x64, 0x74, 0x65, 0x73, 0x74, 0x62, 0x76, 0x73, 0x64, 0x74, 0x65, 0x73, 0x74, 0xFF, 0x0};
   thing.decode((uint8_t*)buf, sizeof(buf));
@@ -258,7 +258,7 @@ test(createaManyProperties)
   thing.addProperty(test_1, "test_1", Permission::ReadWrite);
   thing.addProperty(otherStuff, "otherStuff", Permission::ReadWrite);
 
-  int ret = thing.poll((uint8_t*)buf, 200);
+  int ret = thing.encode((uint8_t*)buf, 200);
   assertEqual(ret, 87);
 }
 
@@ -275,13 +275,13 @@ test(reportEvery)
   int test_1 = 10;
 
   thing.addProperty(test_1, "test_1", Permission::ReadWrite).publishEvery(1 * SECONDS);
-  int ret = thing.poll((uint8_t*)buf, 200);
+  int ret = thing.encode((uint8_t*)buf, 200);
 
-  ret = thing.poll((uint8_t*)buf, 200);
+  ret = thing.encode((uint8_t*)buf, 200);
   assertEqual(ret, 0);
 
   delay(2000);
-  ret = thing.poll((uint8_t*)buf, 200);
+  ret = thing.encode((uint8_t*)buf, 200);
   assertNotEqual(ret, 0);
 }
 
@@ -291,12 +291,12 @@ test(writeOnly)
   thing.begin();
 
   uint8_t buf[200];
-  thing.poll((uint8_t*)buf, 200);
+  thing.encode((uint8_t*)buf, 200);
 
   int test_1 = 10;
 
   thing.addProperty(test_1, "test_1", Permission::Write);
-  int ret = thing.poll((uint8_t*)buf, 200);
+  int ret = thing.encode((uint8_t*)buf, 200);
 
   assertEqual(ret, 0);
 }
@@ -312,7 +312,7 @@ test(callback)
   thing.begin();
 
   uint8_t buf[200];
-  thing.poll((uint8_t*)buf, 200);
+  thing.encode((uint8_t*)buf, 200);
 
   int test_1 = 10;
 
@@ -335,13 +335,13 @@ test(minimumDelta)
   int delta = 6;
 
   thing.addProperty(test_1, "test", Permission::ReadWrite).publishOnChange(delta);
-  thing.poll((uint8_t*)buf, 200);
+  thing.encode((uint8_t*)buf, 200);
 
   test_1 += 4;
-  int ret = thing.poll((uint8_t*)buf, 200);
+  int ret = thing.encode((uint8_t*)buf, 200);
   assertEqual(ret, 0);
 
   test_1 += 4;
-  ret = thing.poll((uint8_t*)buf, 200);
+  ret = thing.encode((uint8_t*)buf, 200);
   assertNotEqual(ret, 0);
 }
