@@ -345,3 +345,30 @@ test(minimumDelta)
   ret = thing.encode((uint8_t*)buf, 200);
   assertNotEqual(ret, 0);
 }
+
+test(testRateLimitWhenPublishOnChange)
+{
+  ArduinoCloudThing thing;
+  thing.begin();
+
+  uint8_t   buf[200];
+  int       int_property = 0;
+  int const min_delta    = 0;
+  unsigned long const min_time_between_updates_ms = 200; /* No updates faster than 200 ms */
+
+  thing.addProperty(int_property, "int_property", Permission::ReadWrite).publishOnChange(min_delta, min_time_between_updates_ms);
+  thing.encode(buf, 200); /* The first time encode is called we are relaying all data to the server for the first time - ergo it should not count */
+
+  unsigned long start = millis();
+  for(int i = 0; i < 500; i++) {
+    int_property++;
+    unsigned long current = millis();
+    int const bytes_encoded = thing.encode(buf, 200);
+    if(current < min_time_between_updates_ms) {
+      assertEqual(bytes_encoded, 0);
+    } else {
+      assertNotEqual(bytes_encoded, 0);
+      start = millis();
+    }
+  }
+}
