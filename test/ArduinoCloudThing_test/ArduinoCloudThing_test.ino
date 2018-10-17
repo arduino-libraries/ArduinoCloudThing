@@ -334,10 +334,11 @@ test(testMinimumDeltaWhenPublishOnChange)
   int delta = 6;
 
   thing.addProperty(test_1, "test", Permission::ReadWrite).publishOnChange(delta);
-  thing.encode(buf, 200);
+  int ret = thing.encode(buf, 200);
+  assertNotEqual(ret, 0);
 
   test_1 += 4;
-  int ret = thing.encode(buf, 200);
+  ret = thing.encode(buf, 200);
   assertEqual(ret, 0);
 
   test_1 += 4;
@@ -361,11 +362,12 @@ test(testRateLimitWhenPublishOnChange)
   unsigned long start = millis();
   for(int i = 0; i < 500; i++) {
     int_property++;
-    int const bytes_encoded = thing.encode(buf, 200);
-    unsigned long current = millis();
-    if(current < min_time_between_updates_ms) {
+    if((millis() - start) < min_time_between_updates_ms) {
+      int const bytes_encoded = thing.encode(buf, 200);
       assertEqual(bytes_encoded, 0);
-    } else {
+    }
+    else {
+      int const bytes_encoded = thing.encode(buf, 200);
       assertNotEqual(bytes_encoded, 0);
       start = millis();
     }
