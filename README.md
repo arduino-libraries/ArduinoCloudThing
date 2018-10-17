@@ -45,9 +45,9 @@ thing.addProperty(int_property, "test_int_property", Permission::ReadWrite).publ
 ...
 ```
 
-* **poll** Checks all properties if their value has changed and if so populates the buffer with the desired CBOR update message.
+* **encode** Checks all properties if their value has changed and if so populates the buffer with the desired CBOR update message.
 
-`int poll(uint8_t * data, size_t const size)`
+`int encode(uint8_t * data, size_t const size)`
 
 * **decode** decodes a CBOR buffer received from the cloud and updates writeable propperties accordingly. Also the update callbacks are called, if the value of a property has changed.
 
