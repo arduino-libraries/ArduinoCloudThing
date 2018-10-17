@@ -334,7 +334,7 @@ test(minimumDelta)
   int test_1 = 10;
   int delta = 6;
 
-  thing.addProperty(test_1, "test", Permission::ReadWrite).publishOnChange().setMinDelta(delta);
+  thing.addProperty(test_1, "test", Permission::ReadWrite).publishOnChange(delta);
   thing.poll((uint8_t*)buf, 200);
 
   test_1 += 4;
