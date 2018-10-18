@@ -346,7 +346,7 @@ test(testMinimumDeltaWhenPublishOnChange)
   assertNotEqual(ret, 0);
 }
 
-test(testRateLimitWhenPublishOnChange)
+test(testWhenPublishOnChangeIfRateLimitWorks)
 {
   ArduinoCloudThing thing;
   thing.begin();
@@ -360,17 +360,60 @@ test(testRateLimitWhenPublishOnChange)
   thing.encode(buf, 200); /* The first time encode is called we are relaying all data to the server for the first time - ergo it should not count */
 
   unsigned long start = millis();
-  for(int i = 0; i < 500; i++) {
+  for(int i = 0; i < 50; i++) {
     int_property++;
     if((millis() - start) < min_time_between_updates_ms) {
-      int const bytes_encoded = thing.encode(buf, 200);
-      assertEqual(bytes_encoded, 0);
+      assertEqual(thing.encode(buf, 200), 0);
     }
     else {
-      int const bytes_encoded = thing.encode(buf, 200);
-      assertNotEqual(bytes_encoded, 0);
+      assertNotEqual(thing.encode(buf, 200), 0);
       start = millis();
     }
-    delay(1);
+    delay(10);
   }
+}
+
+test(testWhenPublishEveryNSecondsIfDataIsReallyOnlyPublishedEveryNSeconds)
+{
+  ArduinoCloudThing thing;
+  thing.begin();
+
+  uint8_t buf[200];
+  bool    bool_property = true;
+  
+  unsigned long const PUBLISH_INTERVAL_SEC = 1;
+  
+  thing.addProperty(bool_property, "bool_property", Permission::ReadWrite).publishEvery(PUBLISH_INTERVAL_SEC);
+  
+  assertNotEqual(thing.encode(buf, 200), 0); /* Call 'encode' once since on the first call the data is always encoded */
+
+
+  unsigned long start = millis();
+  for(int i = 0; i < 3; i++) {
+    /* If we have not reached the publish interval yet - no data should be generated in 'encode' */
+    if((millis() - start) < (PUBLISH_INTERVAL_SEC * 1000)) {
+      assertEqual(thing.encode(buf, 200), 0);
+    }
+    /* If we have reached the publish interval - no data should be generated in 'encode' */
+    else {
+      assertNotEqual(thing.encode(buf, 200), 0);
+      start = millis();
+    }
+    delay(100);
+  }
+}
+
+test(testWhenPublishOnChangeIfPropertyIsNotChangedValueShouldBeEncodedOnlyOnceAtStartup)
+{
+  ArduinoCloudThing thing;
+  thing.begin();
+
+  uint8_t buf[200];
+  bool    bool_property = true;
+  
+  thing.addProperty(bool_property, "bool_property", Permission::ReadWrite);
+  
+  assertNotEqual(thing.encode(buf, 200), 0); /* This is the 1st call to 'encode' - therefore we need to send data to the cloud */
+  assertEqual   (thing.encode(buf, 200), 0); /* This is the 2nd call to 'encode' - since the bool_property did not change we do NOT need to send data to the cloud */
+  assertEqual   (thing.encode(buf, 200), 0); /* This is the 3rd call to 'encode' - since the bool_property did not change we do NOT need to send data to the cloud */
 }
