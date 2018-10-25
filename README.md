@@ -10,7 +10,7 @@ The main focus of the library is on resource usage (never use more data than nee
 
 `ArduinoCloudThing thing`
 
-* Initialize the **thing9** (initialisation adds a `status` property) via
+* Initialize the **thing** (initialisation adds a `status` property) via
 
 `thing.begin()`
 
@@ -49,6 +49,6 @@ thing.addProperty(int_property, "test_int_property", Permission::ReadWrite).publ
 
 `int encode(uint8_t * data, size_t const size)`
 
-* **decode** decodes a CBOR buffer received from the cloud and updates writeable propperties accordingly. Also the update callbacks are called, if the value of a property has changed.
+* **decode** decodes a CBOR buffer received from the cloud and updates writeable properties accordingly. Also the update callbacks are called, if the value of a property has changed.
 
 `decode(uint8_t const * const data, size_t const length)`
