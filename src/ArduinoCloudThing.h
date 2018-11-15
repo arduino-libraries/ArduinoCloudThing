@@ -1,12 +1,18 @@
 #ifndef ARDUINO_CLOUD_THING_H_
 #define ARDUINO_CLOUD_THING_H_
 
+/******************************************************************************
+ * INCLUDE
+ ******************************************************************************/
+
 #include "ArduinoCloudProperty.hpp"
 #include "ArduinoCloudPropertyContainer.hpp"
 
 #include "lib/LinkedList/LinkedList.h"
 
-/* Constants for backwards compatibility */
+/******************************************************************************
+ * CONSTANTS
+ ******************************************************************************/
 
 static bool ON  = true;
 static bool OFF = false;
@@ -17,9 +23,13 @@ static long const MINUTES   = 60;
 static long const HOURS     = 3600;
 static long const DAYS      = 86400;
 
+/******************************************************************************
+ * CLASS DECLARATION
+ ******************************************************************************/
+
 class ArduinoCloudThing {
     public:
-        ArduinoCloudThing();
+        ArduinoCloudThing(CloudProtocol const cloud_protocol = CloudProtocol::V1);
         void begin();
 
         ArduinoCloudProperty<bool>   & addPropertyReal(bool   & property, String const & name, Permission const permission);
@@ -34,6 +44,7 @@ class ArduinoCloudThing {
 
     private:
 
+        CloudProtocol           const _cloud_protocol;
         bool                          _status = OFF;
         char                          _uuid[33];
         ArduinoCloudPropertyContainer _property_cont;

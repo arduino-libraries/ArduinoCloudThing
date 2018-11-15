@@ -1,9 +1,26 @@
 #ifndef ARDUINO_CLOUD_PROPERTY_HPP_
 #define ARDUINO_CLOUD_PROPERTY_HPP_
 
+/******************************************************************************
+ * INCLUDE
+ ******************************************************************************/
+
 #include <Arduino.h>
 
 #include "lib/tinycbor/cbor-lib.h"
+
+/******************************************************************************
+ * TYPEDEF
+ ******************************************************************************/
+
+/******************************************************************************
+ * TYPEDEF
+ ******************************************************************************/
+
+enum class CloudProtocol {
+  V1, /* [{"n": "test", "vb": true}] */
+  V2  /* [{0: "test", 4: true}]      */
+};
 
 enum class Permission {
   Read, Write, ReadWrite
@@ -17,8 +34,31 @@ enum class UpdatePolicy {
   OnChange, TimeInterval
 };
 
+/* Source: https://tools.ietf.org/html/rfc8428#section-6 */
+enum class CborIntegerMapKey : int
+{
+   BaseVersion  = -1, /* bver */
+   BaseName     = -2, /* bn   */
+   BaseTime     = -3, /* bt   */
+   BaseUnit     = -4, /* bu   */
+   BaseValue    = -5, /* bv   */
+   BaseSum      = -6, /* bs   */
+   Name         =  0, /* n    */
+   Unit         =  1, /* u    */
+   Value        =  2, /* v    */
+   StringValue  =  3, /* vs   */
+   BooleanValue =  4, /* vb   */
+   Sum          =  5, /* s    */
+   Time         =  6, /* t    */
+   UpdateTime   =  7, /* ut   */
+   DataValue    =  8  /* vd   */
+};
+
 typedef void(*UpdateCallbackFunc)(void);
 
+/******************************************************************************
+ * CLASS DECLARATION
+ ******************************************************************************/
 
 template <typename T>
 class ArduinoCloudProperty {
@@ -40,7 +80,7 @@ public:
   bool shouldBeUpdated        () const;
   void execCallbackOnChange   ();
 
-  void append                 (CborEncoder * encoder);
+  void append                 (CborEncoder * encoder, CloudProtocol const cloud_protocol);
 
 private:
 
@@ -59,13 +99,23 @@ private:
   unsigned long      _last_updated_millis,
                      _update_interval_millis;
 
-  void appendValue(CborEncoder * mapEncoder) const;
+  void appendValue(CborEncoder * mapEncoder, CloudProtocol const cloud_protocol) const;
   bool isValueDifferent(T const lhs, T const rhs) const;
+
+  T getInitialMinDeltaPropertyValue() const;
 
 };
 
+/******************************************************************************
+ * PROTOTYPE FREE FUNCTIONs
+ ******************************************************************************/
+
 template <typename T>
 inline bool operator == (ArduinoCloudProperty<T> const & lhs, ArduinoCloudProperty<T> const & rhs) { return (lhs.name() == rhs.name()); }
+
+/******************************************************************************
+ * TEMPLATE IMPLEMENTATION
+ ******************************************************************************/
 
 #include "ArduinoCloudProperty.ipp"
 
