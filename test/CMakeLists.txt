@@ -16,6 +16,8 @@ set(TEST_TARGET testArduinoCloudThing)
 set(TEST_SRCS
   src/main.cpp
   ../src/ArduinoCloudPropertyContainer.cpp
+  ../src/ArduinoCloudPropertyContainer.ipp
+  ../src/ArduinoCloudProperty.ipp
   ../src/ArduinoCloudThing.cpp
   ../src/lib/tinycbor/src/cborencoder.c
   ../src/lib/tinycbor/src/cborencoder_close_container_checked.c
