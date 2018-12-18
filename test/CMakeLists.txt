@@ -4,7 +4,7 @@ cmake_minimum_required(VERSION 2.8)
 
 ##########################################################################
 
-include_directories(.)
+include_directories(include)
 include_directories(../src)
 include_directories(external/catch/current/include)
 
@@ -14,7 +14,7 @@ set(CMAKE_CXX_STANDARD 11)
 
 set(TEST_TARGET testArduinoCloudThing)
 set(TEST_SRCS
-  main.cpp
+  src/main.cpp
   ../src/ArduinoCloudPropertyContainer.cpp
   ../src/ArduinoCloudThing.cpp
   ../src/lib/tinycbor/src/cborencoder.c
