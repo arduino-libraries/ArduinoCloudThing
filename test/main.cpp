@@ -34,6 +34,7 @@ std::vector<uint8_t> encode(ArduinoCloudThing & thing)
 
 SCENARIO("Arduino Cloud Properties are encoded", "[ArduinoCloudThing::encode]")
 {
+  /************************************************************************************/
   GIVEN("Cloud Protocol V1")
   {
     ArduinoCloudThing thing(CloudProtocol::V1);
