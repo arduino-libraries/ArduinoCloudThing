@@ -141,4 +141,32 @@ SCENARIO("Arduino Cloud Properties are encoded", "[ArduinoCloudThing::encode]")
   }
 
   /************************************************************************************/
+
+  WHEN("A 'String' property is added")
+  {
+    GIVEN("CloudProtocol::V1")
+    {
+      ArduinoCloudThing thing(CloudProtocol::V1);
+      thing.begin();
+      encode(thing);
+
+      /* TODO */
+    }
+    GIVEN("CloudProtocol::V2")
+    {
+      ArduinoCloudThing thing(CloudProtocol::V2);
+      thing.begin();
+      encode(thing);
+
+      String string_test("test");
+      thing.addPropertyReal(string_test, "test", Permission::ReadWrite);
+
+      /* [{0: "test", 3: "test"}] = 81 BF 00 64 74 65 73 74 03 64 74 65 73 74 FF */
+      std::vector<uint8_t> const expected = {0x81, 0xBF, 0x00, 0x64, 0x74, 0x65, 0x73, 0x74, 0x03, 0x64, 0x74, 0x65, 0x73, 0x74, 0xFF};
+      std::vector<uint8_t> const actual = encode(thing);
+      REQUIRE(actual == expected);
+    }
+  }
+
+  /************************************************************************************/
 }
