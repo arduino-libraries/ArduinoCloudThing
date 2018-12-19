@@ -74,6 +74,40 @@ SCENARIO("Arduino Cloud Properties are encoded", "[ArduinoCloudThing::encode]")
 
   /************************************************************************************/
 
+  WHEN("A 'bool' property is added")
+  {
+    GIVEN("CloudProtocol::V1")
+    {
+      ArduinoCloudThing thing(CloudProtocol::V1);
+      thing.begin();
+      encode(thing);
+
+      bool test = true;
+      thing.addPropertyReal(test, "test", Permission::ReadWrite);
+
+      /* [{"n": "test", "vb": true}] = 81 BF 61 6E 64 74 65 73 74 62 76 62 F5 FF */
+      std::vector<uint8_t> const expected = {0x81, 0xBF, 0x61, 0x6E, 0x64, 0x74, 0x65, 0x73, 0x74, 0x62, 0x76, 0x62, 0xF5, 0xFF};
+      std::vector<uint8_t> const actual = encode(thing);
+      REQUIRE(actual == expected);
+    }
+    GIVEN("CloudProtocol::V2")
+    {
+      ArduinoCloudThing thing(CloudProtocol::V2);
+      thing.begin();
+      encode(thing);
+
+      bool test = true;
+      thing.addPropertyReal(test, "test", Permission::ReadWrite);
+
+      /* [{0: "test", 4: true}] = 81 BF 00 64 74 65 73 74 04 F5 FF */
+      std::vector<uint8_t> const expected = {0x81, 0xBF, 0x00, 0x64, 0x74, 0x65, 0x73, 0x74, 0x04, 0xF5, 0xFF};
+      std::vector<uint8_t> const actual = encode(thing);
+      REQUIRE(actual == expected);
+    }
+  }
+
+  /************************************************************************************/
+
   WHEN("A 'int' property is added")
   {
     GIVEN("CloudProtocol::V1")
