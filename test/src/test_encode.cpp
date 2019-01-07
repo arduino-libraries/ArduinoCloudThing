@@ -4,6 +4,8 @@
 
 SCENARIO("Arduino Cloud Properties are encoded", "[ArduinoCloudThing::encode]")
 {
+  /************************************************************************************/
+
   WHEN("Only the boolean 'status' default property has been added")
   {
     GIVEN("CloudProtocol::V1")
