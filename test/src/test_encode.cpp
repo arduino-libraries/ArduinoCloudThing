@@ -148,6 +148,7 @@ SCENARIO("Arduino Cloud Properties are encoded", "[ArduinoCloudThing::encode]")
       thing.begin();
       encode(thing);
 
+      /* TODO */
 //      String string_test("test");
 //      thing.addPropertyReal(string_test, "test", Permission::ReadWrite);
 //

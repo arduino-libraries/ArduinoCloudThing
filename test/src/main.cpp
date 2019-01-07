@@ -46,4 +46,6 @@ void print(std::vector<uint8_t> const & vect)
  * TEST CODE
  **************************************************************************************/
 
+#include "test_decode.cpp"
 #include "test_encode.cpp"
+
