@@ -48,4 +48,5 @@ void print(std::vector<uint8_t> const & vect)
 
 #include "test_decode.cpp"
 #include "test_encode.cpp"
+#include "test_readOnly.cpp"
 
