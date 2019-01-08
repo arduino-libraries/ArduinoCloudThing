@@ -14,6 +14,7 @@ set(CMAKE_CXX_STANDARD 11)
 
 set(TEST_TARGET testArduinoCloudThing)
 set(TEST_SRCS
+  src/Arduino.cpp
   src/main.cpp
   ../src/ArduinoCloudPropertyContainer.cpp
   ../src/ArduinoCloudPropertyContainer.ipp

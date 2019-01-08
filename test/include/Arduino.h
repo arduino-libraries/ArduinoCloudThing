@@ -18,9 +18,15 @@
 typedef std::string String;
 
 /******************************************************************************
- * FUNCTIONS
+ * FUNCTION PROTOTYPES
  ******************************************************************************/
 
-static int millis() { return 0; }
+/* In order to speed up testing the following two functions are not
+ * honoring the contract set up by their name.
+ *  * millis() is returning the microseconds since system start
+ *  * delay() is delaying by 'delay_ms' microseconds - not milliseconds
+ */
+unsigned long millis();
+void delay(unsigned long const delay_ms);
 
 #endif /* TEST_ARDUINO_H_ */
