@@ -34,6 +34,8 @@ void print(std::vector<uint8_t> const & vect)
   {
     std::cout << std::uppercase
               << std::hex
+              << std::setw(2)
+              << std::setfill('0')
               << static_cast<size_t>(*i)
               << std::dec
               << std::nouppercase
