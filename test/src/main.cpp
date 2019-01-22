@@ -51,6 +51,7 @@ void print(std::vector<uint8_t> const & vect)
 #include "test_encode.cpp"
 #include "test_publishEvery.cpp"
 #include "test_publishOnChange.cpp"
+#include "test_publishOnChangeRateLimit.cpp"
 #include "test_readOnly.cpp"
 #include "test_writeOnly.cpp"
 
