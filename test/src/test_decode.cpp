@@ -97,7 +97,14 @@ SCENARIO("Arduino Cloud Properties are decoded", "[ArduinoCloudThing::decode]")
       ArduinoCloudThing thing(CloudProtocol::V1);
       thing.begin();
 
-      /* TODO */
+      String str = "test";
+      thing.addPropertyReal(str, "test", Permission::ReadWrite);
+
+      /* [{"n": "test", "vs": "testtt"}] = 9F BF 61 6E 64 74 65 73 74 62 76 73 66 74 65 73 74 74 74 FF FF */
+      uint8_t const payload[] = {0x9F, 0xBF, 0x61, 0x6E, 0x64, 0x74, 0x65, 0x73, 0x74, 0x62, 0x76, 0x73, 0x66, 0x74, 0x65, 0x73, 0x74, 0x74, 0x74, 0xFF, 0xFF};
+      thing.decode(payload, sizeof(payload)/sizeof(uint8_t));
+
+      REQUIRE(str == "testtt");
     }
     GIVEN("CloudProtocol::V2")
     {
