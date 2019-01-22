@@ -142,7 +142,13 @@ SCENARIO("Arduino Cloud Properties are encoded", "[ArduinoCloudThing::encode]")
       thing.begin();
       encode(thing);
 
-      /* TODO */
+      String string_test("test");
+      thing.addPropertyReal(string_test, "test", Permission::ReadWrite);
+
+      /* [{"n": "test", "vs": "test"}] = 81 BF 61 6E 64 74 65 73 74 62 76 73 64 74 65 73 74 FF */
+      std::vector<uint8_t> const expected = {0x81, 0xBF, 0x61, 0x6E, 0x64, 0x74, 0x65, 0x73, 0x74, 0x62, 0x76, 0x73, 0x64, 0x74, 0x65, 0x73, 0x74, 0xFF};
+      std::vector<uint8_t> const actual = encode(thing);
+      REQUIRE(actual == expected);
     }
     GIVEN("CloudProtocol::V2")
     {
@@ -150,14 +156,13 @@ SCENARIO("Arduino Cloud Properties are encoded", "[ArduinoCloudThing::encode]")
       thing.begin();
       encode(thing);
 
-      /* TODO */
-//      String string_test("test");
-//      thing.addPropertyReal(string_test, "test", Permission::ReadWrite);
-//
-//      /* [{0: "test", 3: "test"}] = 81 BF 00 64 74 65 73 74 03 64 74 65 73 74 FF */
-//      std::vector<uint8_t> const expected = {0x81, 0xBF, 0x00, 0x64, 0x74, 0x65, 0x73, 0x74, 0x03, 0x64, 0x74, 0x65, 0x73, 0x74, 0xFF};
-//      std::vector<uint8_t> const actual = encode(thing);
-//      REQUIRE(actual == expected);
+      String string_test("test");
+      thing.addPropertyReal(string_test, "test", Permission::ReadWrite);
+
+      /* [{0: "test", 3: "test"}] = 81 BF 00 64 74 65 73 74 03 64 74 65 73 74 FF */
+      std::vector<uint8_t> const expected = {0x81, 0xBF, 0x00, 0x64, 0x74, 0x65, 0x73, 0x74, 0x03, 0x64, 0x74, 0x65, 0x73, 0x74, 0xFF};
+      std::vector<uint8_t> const actual = encode(thing);
+      REQUIRE(actual == expected);
     }
   }
 
