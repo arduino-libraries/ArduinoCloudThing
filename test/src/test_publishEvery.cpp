@@ -17,31 +17,31 @@ SCENARIO("A Arduino cloud property is published periodically", "[ArduinoCloudThi
 
     thing.addPropertyReal(test, "test", Permission::ReadWrite).publishEvery(PUBLISH_INTERVAL_SEC);
 
-    WHEN("update time not yet passed, first call to 'encode'")
+    WHEN("t = 0 ms, publish interval = 1000 ms, 1st call to 'encode'")
     {
       set_millis(0);
       THEN("'encode' should encode the property")
       {
         REQUIRE(encode(thing).size() != 0);
-        WHEN("We are 1 ms before the 1st update interval")
+        WHEN("t = 999 ms")
         {
           set_millis(999);
           THEN("'encode' should not encode the property")
           {
             REQUIRE(encode(thing).size() == 0);
-            WHEN("Exactly 1 second has passed")
+            WHEN("t = 1000 ms")
             {
               set_millis(1000);
               THEN("'encode' should encode the property")
               {
                 REQUIRE(encode(thing).size() != 0);
-                WHEN("We are 1 ms before the 2nd update interval")
+                WHEN("t = 1999 ms")
                 {
                  set_millis(1999);
                  THEN("'encode' should not encode the property")
                  {
                    REQUIRE(encode(thing).size() == 0);
-                   WHEN("Exactly 2 seconds have passed")
+                   WHEN("t = 2000 ms")
                    {
                      set_millis(2000);
                      THEN("'encode' should encode the property")

@@ -56,4 +56,3 @@ void print(std::vector<uint8_t> const & vect)
 #include "test_publishOnChangeRateLimit.cpp"
 #include "test_readOnly.cpp"
 #include "test_writeOnly.cpp"
-
