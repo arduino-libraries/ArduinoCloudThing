@@ -9,32 +9,13 @@
  * INCLUDE
  ******************************************************************************/
 
-#include <string.h>
-
 #include <string>
 
 /******************************************************************************
- * CLASS DECLARATION
+ * TYPEDEF
  ******************************************************************************/
 
-class String
-{
-public:
-
-  String();
-  String(char const * str);
-  String(String const & str);
-
-  inline char const * c_str() const { return _str.c_str(); }
-
-private:
-
-  std::string _str;
-
-};
-
-bool operator == (String const & lhs, String const & rhs);
-bool operator != (String const & lhs, String const & rhs);
+typedef std::string String;
 
 /******************************************************************************
  * FUNCTION PROTOTYPES
