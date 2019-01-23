@@ -8,20 +8,11 @@
 
 #include <Arduino.h>
 
-#include <thread>
-#include <chrono>
-
 /******************************************************************************
- * NAMESPACES
+ * GLOBAL VARIABLES
  ******************************************************************************/
 
-using namespace std::chrono;
-
-/******************************************************************************
- * GLOBAL CONSTANTS
- ******************************************************************************/
-
-time_point<steady_clock> const START = steady_clock::now();
+static unsigned long current_millis = 0;
 
 /******************************************************************************
  * CTOR/DTOR
@@ -56,12 +47,12 @@ bool operator != (String const & lhs, String const & rhs)
   return !(lhs == rhs);
 }
 
-unsigned long millis()
+void set_millis(unsigned long const millis)
 {
-  return static_cast<unsigned long>(duration_cast<microseconds>(steady_clock::now() - START).count());
+  current_millis = millis;
 }
 
-void delay(unsigned long const delay_ms)
+unsigned long millis()
 {
-  std::this_thread::sleep_for(microseconds(delay_ms));
+  return current_millis;
 }
