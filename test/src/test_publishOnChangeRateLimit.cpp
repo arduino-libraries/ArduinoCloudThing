@@ -18,34 +18,34 @@ SCENARIO("A Arduino cloud property is published on value change but the update r
 
     thing.addPropertyReal(test, "test", Permission::ReadWrite).publishOnChange(MIN_DELTA, MIN_TIME_BETWEEN_UPDATES_ms);
 
-    WHEN("test not modified, update time not yet passed, first call to 'encode'")
+    WHEN("t = 0 ms, min time between updates = 500 ms, property not modified, 1st call to 'encode'")
     {
       set_millis(0);
       THEN("'encode' should encode the property")
       {
         REQUIRE(encode(thing).size() != 0);
-        WHEN("test modified, update time not yet passed")
+        WHEN("t = 499 ms, property modified")
         {
           test++;
           set_millis(499);
           THEN("'encode' should not encode any property")
           {
             REQUIRE(encode(thing).size() == 0);
-            WHEN("test modified, update time passed")
+            WHEN("t = 500 ms, property modified")
             {
               test++;
               set_millis(500);
               THEN("'encode' should encode the property")
               {
                 REQUIRE(encode(thing).size() != 0);
-                WHEN("test modified, update time not yet passed")
+                WHEN("t = 999 ms, property modified")
                 {
                   test++;
                   set_millis(999);
                   THEN("'encode' should not encode any property")
                   {
                     REQUIRE(encode(thing).size() == 0);
-                    WHEN("test modified, update time passed")
+                    WHEN("t = 1000 ms, property modified")
                     {
                       test++;
                       set_millis(1000);
