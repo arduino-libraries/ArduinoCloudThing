@@ -16,31 +16,46 @@ SCENARIO("A Arduino cloud property is published periodically", "[ArduinoCloudThi
     unsigned long const PUBLISH_INTERVAL_SEC = 1 * SECONDS;
 
     thing.addPropertyReal(test, "test", Permission::ReadWrite).publishEvery(PUBLISH_INTERVAL_SEC);
-    REQUIRE(encode(thing).size() != 0); /* Initial encoding of the 'test' property */
 
-    bool test_property_published = false;
-
-    unsigned long start = millis();
-    for(size_t i = 0; i < 5; )
+    WHEN("update time not yet passed, first call to 'encode'")
     {
-      /* If we have not reached the publish interval yet - no data should be generated in 'encode' */
-      if((millis() - start) < (PUBLISH_INTERVAL_SEC * 1000))
+      set_millis(0);
+      THEN("'encode' should encode the property")
       {
-        REQUIRE(encode(thing).size() == 0); /* 'test' property should not be encoded */
-      }
-      /* If we have reached the publish interval - data should be generated in 'encode' */
-      else
-      {
-        test_property_published = encode(thing).size() != 0; /* Encoding the 'test' property */
-        REQUIRE(test_property_published == true);
-        if(test_property_published)
+        REQUIRE(encode(thing).size() != 0);
+        WHEN("We are 1 ms before the 1st update interval")
         {
-          i++;
-          test_property_published = false;
-          start = millis();
+          set_millis(999);
+          THEN("'encode' should not encode the property")
+          {
+            REQUIRE(encode(thing).size() == 0);
+            WHEN("Exactly 1 second has passed")
+            {
+              set_millis(1000);
+              THEN("'encode' should encode the property")
+              {
+                REQUIRE(encode(thing).size() != 0);
+                WHEN("We are 1 ms before the 2nd update interval")
+                {
+                 set_millis(1999);
+                 THEN("'encode' should not encode the property")
+                 {
+                   REQUIRE(encode(thing).size() == 0);
+                   WHEN("Exactly 2 seconds have passed")
+                   {
+                     set_millis(2000);
+                     THEN("'encode' should encode the property")
+                     {
+                       REQUIRE(encode(thing).size() != 0);
+                     }
+                   }
+                 }
+                }
+              }
+            }
+          }
         }
       }
-      delay(10); /* Delay 10 ms */
     }
   }
   GIVEN("CloudProtocol::V2")

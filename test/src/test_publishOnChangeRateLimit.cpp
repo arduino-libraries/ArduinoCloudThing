@@ -18,25 +18,49 @@ SCENARIO("A Arduino cloud property is published on value change but the update r
 
     thing.addPropertyReal(test, "test", Permission::ReadWrite).publishOnChange(MIN_DELTA, MIN_TIME_BETWEEN_UPDATES_ms);
 
-    unsigned long start = millis();
-    /* Encoding the 'test' property - since this is the first encode call since adding the property we shall encode the property */
-    REQUIRE(encode(thing).size() != 0);
-
-    for(int i = 0; i < 10; i++)
+    WHEN("test not modified, update time not yet passed, first call to 'encode'")
     {
-      test++;
-      if((millis() - start) < MIN_TIME_BETWEEN_UPDATES_ms)
+      set_millis(0);
+      THEN("'encode' should encode the property")
       {
-        /* Although the value of test has changed considerably we do not update because the MIN_TIME_BETWEEN_UPDATES_ms has not passed since the last encoding */
-        REQUIRE(encode(thing).size() == 0);
-      }
-      else
-      {
-        /* Now the required time has passed so we will encode the test property */
         REQUIRE(encode(thing).size() != 0);
-        start = millis();
+        WHEN("test modified, update time not yet passed")
+        {
+          test++;
+          set_millis(499);
+          THEN("'encode' should not encode any property")
+          {
+            REQUIRE(encode(thing).size() == 0);
+            WHEN("test modified, update time passed")
+            {
+              test++;
+              set_millis(500);
+              THEN("'encode' should encode the property")
+              {
+                REQUIRE(encode(thing).size() != 0);
+                WHEN("test modified, update time not yet passed")
+                {
+                  test++;
+                  set_millis(999);
+                  THEN("'encode' should not encode any property")
+                  {
+                    REQUIRE(encode(thing).size() == 0);
+                    WHEN("test modified, update time passed")
+                    {
+                      test++;
+                      set_millis(1000);
+                      THEN("'encode' should encode the property")
+                      {
+                        REQUIRE(encode(thing).size() != 0);
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
       }
-      delay(100);
     }
   }
   GIVEN("CloudProtocol::V2")
