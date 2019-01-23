@@ -117,29 +117,61 @@ SCENARIO("Arduino Cloud Properties are decoded", "[ArduinoCloudThing::decode]")
   {
     GIVEN("CloudProtocol::V1")
     {
-      ArduinoCloudThing thing(CloudProtocol::V1);
-      thing.begin();
+      WHEN("Multiple properties of different type are changed via CBOR message")
+      {
+        ArduinoCloudThing thing(CloudProtocol::V1);
+        thing.begin();
 
-      bool   bool_test = false;
-      int    int_test = 1;
-      float  float_test = 2.0f;
-      String str_test("str_test");
+        bool   bool_test = false;
+        int    int_test = 1;
+        float  float_test = 2.0f;
+        String str_test("str_test");
 
-      thing.addPropertyReal(bool_test,  "bool_test",  Permission::ReadWrite);
-      thing.addPropertyReal(int_test,   "int_test",   Permission::ReadWrite);
-      thing.addPropertyReal(float_test, "float_test", Permission::ReadWrite);
-      thing.addPropertyReal(str_test,   "str_test",   Permission::ReadWrite);
+        thing.addPropertyReal(bool_test,  "bool_test",  Permission::ReadWrite);
+        thing.addPropertyReal(int_test,   "int_test",   Permission::ReadWrite);
+        thing.addPropertyReal(float_test, "float_test", Permission::ReadWrite);
+        thing.addPropertyReal(str_test,   "str_test",   Permission::ReadWrite);
 
-      /* [{"n": "bool_test", "vb": true}, {"n": "int_test", "v": 10}, {"n": "float_test", "v": 20.0}, {"n": "str_test", "vs": "hello arduino"}]
-       * = 84 A2 61 6E 69 62 6F 6F 6C 5F 74 65 73 74 62 76 62 F5 A2 61 6E 68 69 6E 74 5F 74 65 73 74 61 76 0A A2 61 6E 6A 66 6C 6F 61 74 5F 74 65 73 74 61 76 F9 4D 00 A2 61 6E 68 73 74 72 5F 74 65 73 74 62 76 73 6D 68 65 6C 6C 6F 20 61 72 64 75 69 6E 6F
-       */
-      uint8_t const payload[] = {0x84, 0xA2, 0x61, 0x6E, 0x69, 0x62, 0x6F, 0x6F, 0x6C, 0x5F, 0x74, 0x65, 0x73, 0x74, 0x62, 0x76, 0x62, 0xF5, 0xA2, 0x61, 0x6E, 0x68, 0x69, 0x6E, 0x74, 0x5F, 0x74, 0x65, 0x73, 0x74, 0x61, 0x76, 0x0A, 0xA2, 0x61, 0x6E, 0x6A, 0x66, 0x6C, 0x6F, 0x61, 0x74, 0x5F, 0x74, 0x65, 0x73, 0x74, 0x61, 0x76, 0xF9, 0x4D, 0x00, 0xA2, 0x61, 0x6E, 0x68, 0x73, 0x74, 0x72, 0x5F, 0x74, 0x65, 0x73, 0x74, 0x62, 0x76, 0x73, 0x6D, 0x68, 0x65, 0x6C, 0x6C, 0x6F, 0x20, 0x61, 0x72, 0x64, 0x75, 0x69, 0x6E, 0x6F};
-      thing.decode(payload, sizeof(payload)/sizeof(uint8_t));
+        /* [{"n": "bool_test", "vb": true}, {"n": "int_test", "v": 10}, {"n": "float_test", "v": 20.0}, {"n": "str_test", "vs": "hello arduino"}]
+         * = 84 A2 61 6E 69 62 6F 6F 6C 5F 74 65 73 74 62 76 62 F5 A2 61 6E 68 69 6E 74 5F 74 65 73 74 61 76 0A A2 61 6E 6A 66 6C 6F 61 74 5F 74 65 73 74 61 76 F9 4D 00 A2 61 6E 68 73 74 72 5F 74 65 73 74 62 76 73 6D 68 65 6C 6C 6F 20 61 72 64 75 69 6E 6F
+         */
+        uint8_t const payload[] = {0x84, 0xA2, 0x61, 0x6E, 0x69, 0x62, 0x6F, 0x6F, 0x6C, 0x5F, 0x74, 0x65, 0x73, 0x74, 0x62, 0x76, 0x62, 0xF5, 0xA2, 0x61, 0x6E, 0x68, 0x69, 0x6E, 0x74, 0x5F, 0x74, 0x65, 0x73, 0x74, 0x61, 0x76, 0x0A, 0xA2, 0x61, 0x6E, 0x6A, 0x66, 0x6C, 0x6F, 0x61, 0x74, 0x5F, 0x74, 0x65, 0x73, 0x74, 0x61, 0x76, 0xF9, 0x4D, 0x00, 0xA2, 0x61, 0x6E, 0x68, 0x73, 0x74, 0x72, 0x5F, 0x74, 0x65, 0x73, 0x74, 0x62, 0x76, 0x73, 0x6D, 0x68, 0x65, 0x6C, 0x6C, 0x6F, 0x20, 0x61, 0x72, 0x64, 0x75, 0x69, 0x6E, 0x6F};
+        thing.decode(payload, sizeof(payload)/sizeof(uint8_t));
 
-      REQUIRE(bool_test  == true);
-      REQUIRE(int_test   == 10);
-      REQUIRE(float_test == Approx(20.0).epsilon(0.01));
-      REQUIRE(str_test   == "hello arduino");
+        REQUIRE(bool_test  == true);
+        REQUIRE(int_test   == 10);
+        REQUIRE(float_test == Approx(20.0).epsilon(0.01));
+        REQUIRE(str_test   == "hello arduino");
+      }
+
+      /********************************************************************************/
+
+      WHEN("Multiple String properties are changed via CBOR message")
+      {
+        ArduinoCloudThing thing(CloudProtocol::V1);
+        thing.begin();
+
+        String str_1("hello"),
+               str_2("arduino"),
+               str_3("cloud"),
+               str_4("test");
+
+        thing.addPropertyReal(str_1, "str_1", Permission::ReadWrite);
+        thing.addPropertyReal(str_2, "str_2", Permission::ReadWrite);
+        thing.addPropertyReal(str_3, "str_3", Permission::ReadWrite);
+        thing.addPropertyReal(str_4, "str_4", Permission::ReadWrite);
+
+        /* [{"n": "str_1", "vs": "I'd like"}, {"n": "str_2", "vs": "a"}, {"n": "str_3", "vs": "cup"}, {"n": "str_4", "vs": "of coffee"}]
+         * = 84 A2 61 6E 65 73 74 72 5F 31 62 76 73 68 49 27 64 20 6C 69 6B 65 A2 61 6E 65 73 74 72 5F 32 62 76 73 61 61 A2 61 6E 65 73 74 72 5F 33 62 76 73 63 63 75 70 A2 61 6E 65 73 74 72 5F 34 62 76 73 69 6F 66 20 63 6F 66 66 65 65
+         */
+        uint8_t const payload[] = {0x84, 0xA2, 0x61, 0x6E, 0x65, 0x73, 0x74, 0x72, 0x5F, 0x31, 0x62, 0x76, 0x73, 0x68, 0x49, 0x27, 0x64, 0x20, 0x6C, 0x69, 0x6B, 0x65, 0xA2, 0x61, 0x6E, 0x65, 0x73, 0x74, 0x72, 0x5F, 0x32, 0x62, 0x76, 0x73, 0x61, 0x61, 0xA2, 0x61, 0x6E, 0x65, 0x73, 0x74, 0x72, 0x5F, 0x33, 0x62, 0x76, 0x73, 0x63, 0x63, 0x75, 0x70, 0xA2, 0x61, 0x6E, 0x65, 0x73, 0x74, 0x72, 0x5F, 0x34, 0x62, 0x76, 0x73, 0x69, 0x6F, 0x66, 0x20, 0x63, 0x6F, 0x66, 0x66, 0x65, 0x65};
+        thing.decode(payload, sizeof(payload)/sizeof(uint8_t));
+
+        REQUIRE(str_1 == "I'd like");
+        REQUIRE(str_2 == "a");
+        REQUIRE(str_3 == "cup");
+        REQUIRE(str_4 == "of coffee");
+      }
     }
     GIVEN("CloudProtocol::V2")
     {
