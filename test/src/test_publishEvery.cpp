@@ -1,5 +1,5 @@
 /*
- * \authors A. Entinger
+ * Copyright (c) 2019 Arduino.  All rights reserved.
  */
 
 SCENARIO("A Arduino cloud property is published periodically", "[ArduinoCloudThing::publishEvery]")
