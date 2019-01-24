@@ -1,0 +1,15 @@
+language: cpp
+sudo: enabled
+
+before_script:
+  - cd test && mkdir build && cd build
+
+script:
+  - cmake ..
+  - make
+  - ./testArduinoCloudThing
+
+after_script:
+  - cd ..
+  - rm -rf build
+
