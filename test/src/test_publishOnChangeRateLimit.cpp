@@ -65,7 +65,7 @@ SCENARIO("A Arduino cloud property is published on value change but the update r
   }
   GIVEN("CloudProtocol::V2")
   {
-    /* TODO */
+    /* Business logic is the same regardless of protocol version - no separate test needed */
   }
 
   /************************************************************************************/
