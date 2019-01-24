@@ -1,5 +1,5 @@
 /*
- * \authors A. Entinger
+ * Copyright (c) 2019 Arduino.  All rights reserved.
  */
 
 #ifndef TEST_ARDUINO_H_

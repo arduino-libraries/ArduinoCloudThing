@@ -1,5 +1,5 @@
 /*
- * \authors A. Entinger
+ * Copyright (c) 2019 Arduino.  All rights reserved.
  */
 
 SCENARIO("Arduino Cloud Properties are decoded", "[ArduinoCloudThing::decode]")
