@@ -306,4 +306,56 @@ SCENARIO("Arduino Cloud Properties are decoded", "[ArduinoCloudThing::decode]")
   }
 
   /************************************************************************************/
+
+  WHEN("A payload containing a CBOR base name is parsed")
+  {
+    GIVEN("CloudProtocol::V1")
+    {
+      ArduinoCloudThing thing(CloudProtocol::V1);
+      thing.begin();
+
+      int test = 0;
+      thing.addPropertyReal(test, "test", Permission::ReadWrite);
+
+      REQUIRE(test == 1);
+    }
+    GIVEN("CloudProtocol::V2")
+    {
+      ArduinoCloudThing thing(CloudProtocol::V2);
+      thing.begin();
+
+      int test = 0;
+      thing.addPropertyReal(test, "test", Permission::ReadWrite);
+
+      REQUIRE(test == 1);
+    }
+  }
+
+  /************************************************************************************/
+
+  WHEN("A payload containing a CBOR time is parsed")
+  {
+    GIVEN("CloudProtocol::V1")
+    {
+      ArduinoCloudThing thing(CloudProtocol::V1);
+      thing.begin();
+
+      int test = 0;
+      thing.addPropertyReal(test, "test", Permission::ReadWrite);
+
+      REQUIRE(test == 1);
+    }
+    GIVEN("CloudProtocol::V2")
+    {
+      ArduinoCloudThing thing(CloudProtocol::V2);
+      thing.begin();
+
+      int test = 0;
+      thing.addPropertyReal(test, "test", Permission::ReadWrite);
+
+      REQUIRE(test == 1);
+    }
+  }
+
+  /************************************************************************************/
 }
