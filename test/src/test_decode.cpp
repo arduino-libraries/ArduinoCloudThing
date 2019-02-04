@@ -272,4 +272,38 @@ SCENARIO("Arduino Cloud Properties are decoded", "[ArduinoCloudThing::decode]")
   }
 
   /************************************************************************************/
+
+  WHEN("A payload containing a CBOR base name is parsed")
+  {
+    GIVEN("CloudProtocol::V1")
+    {
+      ArduinoCloudThing thing(CloudProtocol::V1);
+      thing.begin();
+
+      String str = "hello";
+      thing.addPropertyReal(str, "test", Permission::ReadWrite);
+
+      /* [{"bn": "some-test-base-name", "n": "test", "vs": "test"}] = 81 A3 62 62 6E 73 73 6F 6D 65 2D 74 65 73 74 2D 62 61 73 65 2D 6E 61 6D 65 61 6E 64 74 65 73 74 62 76 73 64 74 65 73 74 */
+      uint8_t const payload[] = {0x81, 0xA3, 0x62, 0x62, 0x6E, 0x73, 0x73, 0x6F, 0x6D, 0x65, 0x2D, 0x74, 0x65, 0x73, 0x74, 0x2D, 0x62, 0x61, 0x73, 0x65, 0x2D, 0x6E, 0x61, 0x6D, 0x65, 0x61, 0x6E, 0x64, 0x74, 0x65, 0x73, 0x74, 0x62, 0x76, 0x73, 0x64, 0x74, 0x65, 0x73, 0x74};
+      thing.decode(payload, sizeof(payload)/sizeof(uint8_t));
+
+      REQUIRE(str == "test");
+    }
+    GIVEN("CloudProtocol::V2")
+    {
+      ArduinoCloudThing thing(CloudProtocol::V2);
+      thing.begin();
+
+      String str = "hello";
+      thing.addPropertyReal(str, "test", Permission::ReadWrite);
+
+      /* [{-2: "some-test-base-name", 0: "test", 3: "test"}] = 81 A3 21 73 73 6F 6D 65 2D 74 65 73 74 2D 62 61 73 65 2D 6E 61 6D 65 00 64 74 65 73 74 03 64 74 65 73 74 */
+      uint8_t const payload[] = {0x81, 0xA3, 0x21, 0x73, 0x73, 0x6F, 0x6D, 0x65, 0x2D, 0x74, 0x65, 0x73, 0x74, 0x2D, 0x62, 0x61, 0x73, 0x65, 0x2D, 0x6E, 0x61, 0x6D, 0x65, 0x00, 0x64, 0x74, 0x65, 0x73, 0x74, 0x03, 0x64, 0x74, 0x65, 0x73, 0x74};
+      thing.decode(payload, sizeof(payload)/sizeof(uint8_t));
+
+      REQUIRE(str == "test");
+    }
+  }
+
+  /************************************************************************************/
 }
