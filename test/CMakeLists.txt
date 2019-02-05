@@ -12,6 +12,8 @@ include_directories(external/catch/current/include)
 
 set(CMAKE_CXX_STANDARD 11)
 
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+
 set(TEST_TARGET testArduinoCloudThing)
 set(TEST_SRCS
   src/Arduino.cpp
@@ -37,6 +39,14 @@ set(TEST_SRCS
 add_executable(
   ${TEST_TARGET}
   ${TEST_SRCS}
+)
+
+##########################################################################
+
+add_custom_command(TARGET ${TEST_TARGET} POST_BUILD
+    COMMAND ${CMAKE_BINARY_DIR}/bin/${TEST_TARGET}
+    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/bin
+    COMMENT "Exeuting unit tests ..."
 )
 
 ##########################################################################
