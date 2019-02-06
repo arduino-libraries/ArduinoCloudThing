@@ -1,6 +1,0 @@
-#define SECRET_SSID "BCMIlabs-2g"
-#define SECRET_PASS "SpaccaBCMISpacca"
-#define SECRET_USER_NAME ""
-#define SECRET_THING_NAME ""
-#define SECRET_THING_ID ""
-#define SECRET_THING_PSW ""
