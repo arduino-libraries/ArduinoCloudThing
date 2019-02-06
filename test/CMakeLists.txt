@@ -14,7 +14,10 @@ set(CMAKE_CXX_STANDARD 11)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
+##########################################################################
+
 set(TEST_TARGET testArduinoCloudThing)
+
 set(TEST_SRCS
   src/Arduino.cpp
   src/main.cpp
@@ -36,6 +39,11 @@ set(TEST_SRCS
 
 ##########################################################################
 
+set(CMAKE_C_FLAGS   ${CMAKE_C_FLAGS}   "--coverage")
+set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} "--coverage")
+
+##########################################################################
+
 add_executable(
   ${TEST_TARGET}
   ${TEST_SRCS}
@@ -44,9 +52,13 @@ add_executable(
 ##########################################################################
 
 add_custom_command(TARGET ${TEST_TARGET} POST_BUILD
-    COMMAND ${CMAKE_BINARY_DIR}/bin/${TEST_TARGET}
-    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/bin
-    COMMENT "Exeuting unit tests ..."
+  COMMENT "Exeuting unit tests ..."
+  WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+  COMMAND lcov --directory . --zerocounters
+  COMMAND bin/${TEST_TARGET}
+  COMMAND lcov --directory . --capture --output-file coverage.info
+  COMMAND lcov --remove coverage.info 'test/*' '/usr/*' 'lib/*' --output-file coverage.info
+  COMMAND lcov --list coverage.info
 )
 
 ##########################################################################
