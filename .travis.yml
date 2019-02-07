@@ -7,7 +7,6 @@ before_script:
 script:
   - cmake ..
   - make
-  - ./testArduinoCloudThing
 
 after_script:
   - cd ..
