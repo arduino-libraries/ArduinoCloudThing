@@ -412,4 +412,38 @@ SCENARIO("Arduino Cloud Properties are decoded", "[ArduinoCloudThing::decode]")
   }
 
   /************************************************************************************/
+
+  WHEN("A payload containing a invalid CBOR key is parsed")
+  {
+    GIVEN("CloudProtocol::V1")
+    {
+      ArduinoCloudThing thing(CloudProtocol::V1);
+      thing.begin();
+
+      int test = 0;
+      thing.addPropertyReal(test, "test", Permission::ReadWrite);
+
+      /* [{"undef": 123, "n": "test", "v": 1}] = 81 A3 65 75 6E 64 65 66 18 7B 61 6E 64 74 65 73 74 61 76 01 */
+      uint8_t const payload[] = {0x81, 0xA3, 0x65, 0x75, 0x6E, 0x64, 0x65, 0x66, 0x18, 0x7B, 0x61, 0x6E, 0x64, 0x74, 0x65, 0x73, 0x74, 0x61, 0x76, 0x01};
+      thing.decode(payload, sizeof(payload)/sizeof(uint8_t));
+
+      REQUIRE(test == 1);
+    }
+    GIVEN("CloudProtocol::V2")
+    {
+      ArduinoCloudThing thing(CloudProtocol::V2);
+      thing.begin();
+
+      int test = 0;
+      thing.addPropertyReal(test, "test", Permission::ReadWrite);
+
+      /* [{123: 123, 0: "test", 2: 1}] = 81 A3 18 7B 18 7B 00 64 74 65 73 74 02 01 */
+      uint8_t const payload[] = {0x81, 0xA3, 0x18, 0x7B, 0x18, 0x7B, 0x00, 0x64, 0x74, 0x65, 0x73, 0x74, 0x02, 0x01};
+      thing.decode(payload, sizeof(payload)/sizeof(uint8_t));
+
+      REQUIRE(test == 1);
+    }
+  }
+
+  /************************************************************************************/
 }
