@@ -50,3 +50,15 @@ void ArduinoCloudPropertyContainer::appendChangedProperties(CborEncoder * arrayE
   appendChangedProperties<float> (_float_property_list,  arrayEncoder, cloud_protocol);
   appendChangedProperties<String>(_string_property_list, arrayEncoder, cloud_protocol);
 }
+
+
+int ArduinoCloudPropertyContainer::updateTimestampOnChangedProperties(unsigned long changeEventTime) {
+  int num_changes_properties = 0;
+
+  num_changes_properties += updateTimestampOnChangedProperties(_bool_property_list,   changeEventTime);
+  num_changes_properties += updateTimestampOnChangedProperties(_int_property_list,    changeEventTime);
+  num_changes_properties += updateTimestampOnChangedProperties(_float_property_list,  changeEventTime);
+  num_changes_properties += updateTimestampOnChangedProperties(_string_property_list, changeEventTime);
+
+  return num_changes_properties;
+}

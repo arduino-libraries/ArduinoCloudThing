@@ -40,6 +40,19 @@ static long const MINUTES   = 60;
 static long const HOURS     = 3600;
 static long const DAYS      = 86400;
 
+
+/******************************************************************************
+ * ENUM DECLARATION
+ ******************************************************************************/
+
+typedef enum {
+  PROPERTIES_SYNC_FORCE_DEVICE,
+  PROPERTIES_SYNC_FORCE_CLOUD,
+  PROPERTIES_SYNC_AUTO,
+  PROPERTIES_SYNC_CUSTOM, 
+  CLOUDSERIAL_SYNC
+} synMode;
+
 /******************************************************************************
  * CLASS DECLARATION
  ******************************************************************************/
@@ -56,10 +69,14 @@ public:
   ArduinoCloudProperty<float>  & addPropertyReal(float  & property, String const & name, Permission const permission);
   ArduinoCloudProperty<String> & addPropertyReal(String & property, String const & name, Permission const permission);
 
+  // compute the timestamp of the local properties changes 
+  int updateTimestampOnChangedProperties(unsigned long time);
   /* encode return > 0 if a property has changed and encodes the changed properties in CBOR format into the provided buffer */
   int encode(uint8_t * data, size_t const size);
+  // encode the getLastValue message 
+  int getLastValues(uint8_t * data, size_t const size);
   /* decode a CBOR payload received from the cloud */
-  void decode(uint8_t const * const payload, size_t const length);
+  void decode(uint8_t const * const payload, size_t const length, int mode = PROPERTIES_SYNC_FORCE_DEVICE);
 
 
 private:
@@ -68,6 +85,7 @@ private:
   bool                          _status = OFF;
   char                          _uuid[33];
   ArduinoCloudPropertyContainer _property_cont;
+  int                           _mode;
 
   enum class MapParserState {
     EnterMap,
@@ -130,6 +148,7 @@ private:
   MapParserState handle_LeaveMap     (CborValue * map_iter, CborValue * value_iter, MapData const * const map_data);
 
   static void   resetMapData                (MapData * map_data);
+  static void   resetMapDataNotBase                (MapData * map_data);
   static double convertCborHalfFloatToDouble(uint16_t const half_val);
 
 };

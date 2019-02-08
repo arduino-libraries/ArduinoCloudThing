@@ -96,26 +96,37 @@ public:
 
   bool shouldBeUpdated        ();
   void execCallbackOnChange   ();
+  void forceCallbackOnChange  ();
+  void setLastChangeTime      (unsigned long cloudChangeTime);
+  bool isAfterLastChange      (unsigned long cloudChangeTime); 
 
   void append                 (CborEncoder * encoder, CloudProtocol const cloud_protocol);
+  void setShadowValue         (T const val);         
+  void updateTime             (unsigned long );
+  bool isChangedLocally       ();
 
 private:
 
   T                & _property,
-                     _shadow_property;
+                     _shadow_property,
+                     _local_shadow_property;
   String             _name;
   Permission         _permission;
   UpdateCallbackFunc _update_callback_func;
 
   UpdatePolicy       _update_policy;
   bool               _has_been_updated_once,
-                     _has_been_modified_in_callback;
+                     _has_been_modified_in_callback;  
   /* Variables used for UpdatePolicy::OnChange */
   T                  _min_delta_property;
   unsigned long      _min_time_between_updates_millis;
   /* Variables used for UpdatePolicy::TimeInterval */
   unsigned long      _last_updated_millis,
                      _update_interval_millis;
+  /* Variables used for reconnection sync*/
+  unsigned long      _local_change_timestamp;
+  unsigned long      _last_change_timestamp;
+        
 
   void appendValue(CborEncoder * mapEncoder, CloudProtocol const cloud_protocol) const;
   bool isValueDifferent(T const lhs, T const rhs) const;
