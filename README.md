@@ -1,4 +1,5 @@
 # Arduino Cloud Thing Middleware
+[![Build Status](https://travis-ci.org/arduino-libraries/ArduinoCloudThing.svg?branch=master)](https://travis-ci.org/arduino-libraries/ArduinoCloudThing)
 
 This library contains the implementation of the class ArduinoCloudThing which allows to add **int**, **bool**, **float**, **String** properties which can be read from or written to the cloud. To achieve this goal ArduinoCloudThing possesses functions for encoding and decoding CBOR (Concise Binary Object Representation) encoded data which is used to transfer the properties value between a **thing** and the **cloud**.
 
