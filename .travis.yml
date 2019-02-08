@@ -1,6 +1,9 @@
 language: cpp
 sudo: enabled
 
+install:
+  - sudo apt-get install lcov
+
 before_script:
   - cd test && mkdir build && cd build
 
