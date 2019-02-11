@@ -53,15 +53,3 @@ add_executable(
 
 ##########################################################################
 
-add_custom_command(TARGET ${TEST_TARGET} POST_BUILD
-  COMMENT "Exeuting unit tests ..."
-  WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-  COMMAND lcov --directory . --zerocounters
-  COMMAND bin/${TEST_TARGET}
-  COMMAND lcov --directory . --capture --output-file coverage.info
-  COMMAND lcov --remove coverage.info 'test/*' '/usr/*' 'lib/*' --output-file coverage.info
-  COMMAND lcov --list coverage.info
-)
-
-##########################################################################
-
