@@ -53,3 +53,13 @@ thing.addProperty(int_property, "test_int_property", Permission::ReadWrite).publ
 * **decode** decodes a CBOR buffer received from the cloud and updates writeable properties accordingly. Also the update callbacks are called, if the value of a property has changed.
 
 `decode(uint8_t const * const data, size_t const length)`
+
+## Unit Tests
+
+The code of `ArduinoCloudThing` is verified via unit tests which are build and executed by the Travis CI system after every commit. However, one can also build and execute the unit tests manually using the following steps:
+```bash
+cd test && mkdir build && cd build
+cmake ..
+make -j4
+bin/testArduinoCloudThing
+```
