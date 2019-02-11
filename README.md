@@ -1,5 +1,6 @@
 # Arduino Cloud Thing Middleware
 [![Build Status](https://travis-ci.org/arduino-libraries/ArduinoCloudThing.svg?branch=master)](https://travis-ci.org/arduino-libraries/ArduinoCloudThing)
+[![Code Coverage](https://codecov.io/gh/arduino-libraries/ArduinoCloudThing/branch/master/graph/badge.svg)](https://codecov.io/gh/arduino-libraries/ArduinoCloudThing)
 
 This library contains the implementation of the class ArduinoCloudThing which allows to add **int**, **bool**, **float**, **String** properties which can be read from or written to the cloud. To achieve this goal ArduinoCloudThing possesses functions for encoding and decoding CBOR (Concise Binary Object Representation) encoded data which is used to transfer the properties value between a **thing** and the **cloud**.
 
@@ -53,3 +54,13 @@ thing.addProperty(int_property, "test_int_property", Permission::ReadWrite).publ
 * **decode** decodes a CBOR buffer received from the cloud and updates writeable properties accordingly. Also the update callbacks are called, if the value of a property has changed.
 
 `decode(uint8_t const * const data, size_t const length)`
+
+## Unit Tests
+
+The code of `ArduinoCloudThing` is verified via unit tests which are build and executed by the Travis CI system after every commit. However, one can also build and execute the unit tests manually using the following steps:
+```bash
+cd test && mkdir build && cd build
+cmake ..
+make -j4
+bin/testArduinoCloudThing
+```
