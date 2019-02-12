@@ -6,9 +6,9 @@ SCENARIO("A Arduino cloud property is published on value change but the update r
 {
   /************************************************************************************/
 
-  GIVEN("CloudProtocol::V1")
+  GIVEN("CloudProtocol::V2")
   {
-    ArduinoCloudThing thing(CloudProtocol::V1);
+    ArduinoCloudThing thing;
     thing.begin();
     REQUIRE(encode(thing).size() != 0); /* Encoding the 'status' property */
 
@@ -62,10 +62,6 @@ SCENARIO("A Arduino cloud property is published on value change but the update r
         }
       }
     }
-  }
-  GIVEN("CloudProtocol::V2")
-  {
-    /* Business logic is the same regardless of protocol version - no separate test needed */
   }
 
   /************************************************************************************/
