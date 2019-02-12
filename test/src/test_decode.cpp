@@ -10,7 +10,7 @@ SCENARIO("Arduino Cloud Properties are decoded", "[ArduinoCloudThing::decode]")
   {
     GIVEN("CloudProtocol::V1")
     {
-      ArduinoCloudThing thing(CloudProtocol::V1);
+      ArduinoCloudThing thing;
       thing.begin();
 
       bool test = true;
@@ -25,7 +25,7 @@ SCENARIO("Arduino Cloud Properties are decoded", "[ArduinoCloudThing::decode]")
     }
     GIVEN("CloudProtocol::V2")
     {
-      ArduinoCloudThing thing(CloudProtocol::V2);
+      ArduinoCloudThing thing;
       thing.begin();
 
       bool test = true;
@@ -46,7 +46,7 @@ SCENARIO("Arduino Cloud Properties are decoded", "[ArduinoCloudThing::decode]")
   {
     GIVEN("CloudProtocol::V1")
     {
-      ArduinoCloudThing thing(CloudProtocol::V1);
+      ArduinoCloudThing thing;
       thing.begin();
 
       int test = 0;
@@ -61,7 +61,7 @@ SCENARIO("Arduino Cloud Properties are decoded", "[ArduinoCloudThing::decode]")
     }
     GIVEN("CloudProtocol::V2")
     {
-      ArduinoCloudThing thing(CloudProtocol::V2);
+      ArduinoCloudThing thing;
       thing.begin();
 
       int test = 0;
@@ -82,7 +82,7 @@ SCENARIO("Arduino Cloud Properties are decoded", "[ArduinoCloudThing::decode]")
   {
     GIVEN("CloudProtocol::V1")
     {
-      ArduinoCloudThing thing(CloudProtocol::V1);
+      ArduinoCloudThing thing;
       thing.begin();
 
       float test = 0.0f;
@@ -97,7 +97,7 @@ SCENARIO("Arduino Cloud Properties are decoded", "[ArduinoCloudThing::decode]")
     }
     GIVEN("CloudProtocol::V2")
     {
-      ArduinoCloudThing thing(CloudProtocol::V2);
+      ArduinoCloudThing thing;
       thing.begin();
 
       float test = 0.0f;
@@ -118,7 +118,7 @@ SCENARIO("Arduino Cloud Properties are decoded", "[ArduinoCloudThing::decode]")
   {
     GIVEN("CloudProtocol::V1")
     {
-      ArduinoCloudThing thing(CloudProtocol::V1);
+      ArduinoCloudThing thing;
       thing.begin();
 
       String str = "test";
@@ -132,7 +132,7 @@ SCENARIO("Arduino Cloud Properties are decoded", "[ArduinoCloudThing::decode]")
     }
     GIVEN("CloudProtocol::V2")
     {
-      ArduinoCloudThing thing(CloudProtocol::V2);
+      ArduinoCloudThing thing;
       thing.begin();
 
       String str = "test";
@@ -154,7 +154,7 @@ SCENARIO("Arduino Cloud Properties are decoded", "[ArduinoCloudThing::decode]")
     {
       WHEN("Multiple properties of different type are changed via CBOR message")
       {
-        ArduinoCloudThing thing(CloudProtocol::V1);
+        ArduinoCloudThing thing;
         thing.begin();
 
         bool   bool_test = false;
@@ -183,7 +183,7 @@ SCENARIO("Arduino Cloud Properties are decoded", "[ArduinoCloudThing::decode]")
 
       WHEN("Multiple String properties are changed via CBOR message")
       {
-        ArduinoCloudThing thing(CloudProtocol::V1);
+        ArduinoCloudThing thing;
         thing.begin();
 
         String str_1("hello"),
@@ -215,7 +215,7 @@ SCENARIO("Arduino Cloud Properties are decoded", "[ArduinoCloudThing::decode]")
     {
       WHEN("Multiple properties of different type are changed via CBOR message")
       {
-        ArduinoCloudThing thing(CloudProtocol::V2);
+        ArduinoCloudThing thing;
         thing.begin();
 
         bool   bool_test = false;
@@ -244,7 +244,7 @@ SCENARIO("Arduino Cloud Properties are decoded", "[ArduinoCloudThing::decode]")
 
       WHEN("Multiple String properties are changed via CBOR message")
       {
-        ArduinoCloudThing thing(CloudProtocol::V2);
+        ArduinoCloudThing thing;
         thing.begin();
 
         String str_1("hello"),
@@ -277,7 +277,7 @@ SCENARIO("Arduino Cloud Properties are decoded", "[ArduinoCloudThing::decode]")
   {
     GIVEN("CloudProtocol::V1")
     {
-      ArduinoCloudThing thing(CloudProtocol::V1);
+      ArduinoCloudThing thing;
       thing.begin();
 
       String str = "hello";
@@ -291,7 +291,7 @@ SCENARIO("Arduino Cloud Properties are decoded", "[ArduinoCloudThing::decode]")
     }
     GIVEN("CloudProtocol::V2")
     {
-      ArduinoCloudThing thing(CloudProtocol::V2);
+      ArduinoCloudThing thing;
       thing.begin();
 
       String str = "hello";
@@ -311,7 +311,7 @@ SCENARIO("Arduino Cloud Properties are decoded", "[ArduinoCloudThing::decode]")
   {
     GIVEN("CloudProtocol::V1")
     {
-      ArduinoCloudThing thing(CloudProtocol::V1);
+      ArduinoCloudThing thing;
       thing.begin();
 
       int test = 0;
@@ -325,7 +325,7 @@ SCENARIO("Arduino Cloud Properties are decoded", "[ArduinoCloudThing::decode]")
     }
     GIVEN("CloudProtocol::V2")
     {
-      ArduinoCloudThing thing(CloudProtocol::V2);
+      ArduinoCloudThing thing;
       thing.begin();
 
       int test = 0;
@@ -345,7 +345,7 @@ SCENARIO("Arduino Cloud Properties are decoded", "[ArduinoCloudThing::decode]")
   {
     GIVEN("CloudProtocol::V1")
     {
-      ArduinoCloudThing thing(CloudProtocol::V1);
+      ArduinoCloudThing thing;
       thing.begin();
 
       int test = 0;
@@ -359,7 +359,7 @@ SCENARIO("Arduino Cloud Properties are decoded", "[ArduinoCloudThing::decode]")
     }
     GIVEN("CloudProtocol::V2")
     {
-      ArduinoCloudThing thing(CloudProtocol::V2);
+      ArduinoCloudThing thing;
       thing.begin();
 
       int test = 0;
@@ -379,7 +379,7 @@ SCENARIO("Arduino Cloud Properties are decoded", "[ArduinoCloudThing::decode]")
   {
     GIVEN("CloudProtocol::V1")
     {
-      ArduinoCloudThing thing(CloudProtocol::V1);
+      ArduinoCloudThing thing;
       thing.begin();
 
       int test = 0;
@@ -395,7 +395,7 @@ SCENARIO("Arduino Cloud Properties are decoded", "[ArduinoCloudThing::decode]")
     }
     GIVEN("CloudProtocol::V2")
     {
-      ArduinoCloudThing thing(CloudProtocol::V2);
+      ArduinoCloudThing thing;
       thing.begin();
 
       int test = 0;
@@ -417,7 +417,7 @@ SCENARIO("Arduino Cloud Properties are decoded", "[ArduinoCloudThing::decode]")
   {
     GIVEN("CloudProtocol::V1")
     {
-      ArduinoCloudThing thing(CloudProtocol::V1);
+      ArduinoCloudThing thing;
       thing.begin();
 
       int test = 0;
@@ -431,7 +431,7 @@ SCENARIO("Arduino Cloud Properties are decoded", "[ArduinoCloudThing::decode]")
     }
     GIVEN("CloudProtocol::V2")
     {
-      ArduinoCloudThing thing(CloudProtocol::V2);
+      ArduinoCloudThing thing;
       thing.begin();
 
       int test = 0;

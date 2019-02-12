@@ -1,4 +1,13 @@
-build
 *~
+
+build
+bin
+CMakeFiles
+
 .project
 .cproject
+
+CMakeCache.txt
+cmake_install.cmake
+Makefile
+

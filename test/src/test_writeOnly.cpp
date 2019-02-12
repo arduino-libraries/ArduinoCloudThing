@@ -6,7 +6,7 @@ SCENARIO("A Arduino cloud property is marked 'write only'", "[ArduinoCloudThing:
 {
   /************************************************************************************/
 
-  ArduinoCloudThing thing(CloudProtocol::V1);
+  ArduinoCloudThing thing;
   thing.begin();
   REQUIRE(encode(thing).size() != 0); /* Encoding the 'status' property */
 
