@@ -83,6 +83,8 @@ void ArduinoCloudThing::begin() {
 
 int ArduinoCloudThing::encode(uint8_t * data, size_t const size) {
 
+  // check if backing storage and cloud has diverged
+  // time interval may be elapsed or property may be changed
   int const num_changed_properties = _property_cont.getNumOfChangedProperties();
 
   if(num_changed_properties > 0) {
