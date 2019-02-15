@@ -113,3 +113,78 @@ SCENARIO("A (boolean) property is manipulated in the callback to its origin stat
     REQUIRE(actual == expected);
   }
 }
+
+/**************************************************************************************/
+
+static bool test     = false;
+static bool sync_callback_called = false;
+static bool change_callback_called = false;
+
+void sync_callback(ArduinoCloudProperty<bool> property)
+{
+  property.setPropertyValue(property.getCloudShadowValue());
+  property.forceCallbackOnChange();
+  sync_callback_called   = true;
+}
+
+void change_callback()
+{
+  change_callback_called = true;
+}
+
+SCENARIO("After a connection/reconnection the sync callback is called and the value of the property is the one received by the cloud")
+{
+  GIVEN("CloudProtocol::V2")
+  {
+    ArduinoCloudThing thing;
+    thing.begin();
+
+    thing.addPropertyReal(switch_turned_on, "switch_turned_on", Permission::ReadWrite).onUpdate(change_callback).onSync(sync_callback);
+
+    /* [{"bt": 1550138810.00, 0: "test", 4: true}] = 81 A3 62 62 74 FB 41 D7 19 4F 6E 80 00 00 00 64 74 65 73 74 04 F5 */
+    uint8_t const payload[] = {0x81 ,0xA3, 0x62, 0x62, 0x74, 0xFB, 0x41, 0xD7, 0x19, 0x4F, 0x6E, 0x80, 0x00, 0x00, 0x00, 0x64, 0x74, 0x65, 0x73, 0x74, 0x04, 0xF5};
+    int const payload_length = sizeof(payload)/sizeof(uint8_t);
+    thing.decode(payload, payload_length, true);
+
+    REQUIRE(sync_callback_called == true);
+    REQUIRE(change_callback_called == true);
+
+    REQUIRE(switch_turned_on == true);
+  }
+}
+
+/**************************************************************************************/
+
+static bool test     = false;
+static bool sync_callback_called = false;
+static bool change_callback_called = false;
+
+void sync_callback(ArduinoCloudProperty<bool> property)
+{
+  sync_callback_called   = true;
+}
+
+void change_callback()
+{
+  change_callback_called = true;
+}
+
+SCENARIO("After a connection/reconnection the sync callback is called and the value of the property is the one fixed locally, the onChange callback isn't called")
+{
+  GIVEN("CloudProtocol::V2")
+  {
+    ArduinoCloudThing thing;
+    thing.begin();
+
+    thing.addPropertyReal(test, "test", Permission::ReadWrite).onUpdate(change_callback).onSync(sync_callback);
+
+    /* [{"bt": 1550138810.00, 0: "test", 4: true}] = 81 A3 62 62 74 FB 41 D7 19 4F 6E 80 00 00 00 64 74 65 73 74 04 F5 */
+    uint8_t const payload[] = {0x81 ,0xA3, 0x62, 0x62, 0x74, 0xFB, 0x41, 0xD7, 0x19, 0x4F, 0x6E, 0x80, 0x00, 0x00, 0x00, 0x64, 0x74, 0x65, 0x73, 0x74, 0x04, 0xF5};
+    int const payload_length = sizeof(payload)/sizeof(uint8_t);
+    thing.decode(payload, payload_length, true);
+
+    REQUIRE(sync_callback_called == true);
+
+    REQUIRE(switch_turned_on == false);
+  }
+}

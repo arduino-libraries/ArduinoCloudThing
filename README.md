@@ -32,7 +32,9 @@ Additional configuration can be added to the property via composition
 
 `.publishOnChange()`
 
-`.onUpdate(functionPointer)` configures the property to call `functionPointer` when the value is changed in the cloud.
+`.onUpdate(functionPointer)` configures the property to call `functionPointer` when the value is changed by the cloud.
+
+`.onSync(syncFunctionPointer)` configures the property to call `syncFunctionPointer` when as consequence of a connection/reconnection (so after a period passed offline) the value of the property must be synchronized with the one stored in the cloud. The implemetation `syncFunctionPointer()` should contain some synchornization logic.
 
 A typical property creation could look like that:
 ```
@@ -43,7 +45,7 @@ void onUpdateCallback() {
 int       int_property = 0;
 int const min_delta    = 6;
 ...
-thing.addProperty(int_property, "test_int_property", Permission::ReadWrite).publishOnChange(min_delta).onUpdate(onUpdateCallback);
+thing.addProperty(int_property, "test_int_property", Permission::ReadWrite).publishOnChange(min_delta).onUpdate(onUpdateCallback).onSync(onSynchronizationCallback);
 ...
 ```
 
@@ -51,9 +53,9 @@ thing.addProperty(int_property, "test_int_property", Permission::ReadWrite).publ
 
 `int encode(uint8_t * data, size_t const size)`
 
-* **decode** decodes a CBOR buffer received from the cloud and updates writeable properties accordingly. Also the update callbacks are called, if the value of a property has changed.
+* **decode**  decodes a CBOR buffer received from the cloud and if the syncMessage parameter is set to false(default), updates writeable properties accordingly and call the update callback if the value of a property has changed. If the syncMessage parameter is set to true, the value of the property received by the cloud and the relative last change timestamp are passed to a synchronization callback. The synchronization callback could apply the logic to assign a value to the property choosing between the local value and the cloud one. The synchronization logic also decide if call the onUpdate callback.
 
-`decode(uint8_t const * const data, size_t const length)`
+`decode(uint8_t const * const payload, size_t const length, bool syncMessage = false)`
 
 ## Unit Tests
 
