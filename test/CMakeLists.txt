@@ -20,7 +20,18 @@ set(TEST_TARGET testArduinoCloudThing)
 
 set(TEST_SRCS
   src/Arduino.cpp
+  
   src/main.cpp
+  src/test_callback.cpp
+  src/test_decode.cpp
+  src/test_encode.cpp
+  src/test_publishEvery.cpp
+  src/test_publishOnChange.cpp
+  src/test_publishOnChangeRateLimit.cpp
+  src/test_readOnly.cpp
+  src/test_writeOnly.cpp
+  src/TestUtil.cpp
+  
   ../src/ArduinoCloudPropertyContainer.cpp
   ../src/ArduinoCloudPropertyContainer.ipp
   ../src/ArduinoCloudProperty.ipp
