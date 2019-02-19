@@ -41,6 +41,7 @@ Additional configuration can be added to the property via composition
 
 A custom synchronization logic may be implemented by setting a custom callback function with the following signature: `void (*_sync_callback_func)(ArduinoCloudProperty<T> property)`; use one of the specific types supported. The `property` object exposes several methods which will enable the custom logic to select the appropriate value.
 
+
 A typical property creation could look like that:
 ```
 void onUpdateCallback() {
@@ -58,7 +59,7 @@ thing.addProperty(int_property, "test_int_property", Permission::ReadWrite).publ
 
 `int encode(uint8_t * data, size_t const size)`
 
-* **decode**  decodes a CBOR buffer received from the cloud and if the syncMessage parameter is set to false(default), updates writeable properties accordingly and call the update callback if the value of a property has changed. If the syncMessage parameter is set to true, the value of the property received by the cloud and the relative last change timestamp are passed to a synchronization callback. The synchronization callback could apply the logic to assign a value to the property choosing between the local value and the cloud one. The synchronization logic also decide if call the onUpdate callback.
+* **decode**  decodes a CBOR buffer received from the cloud and if the syncMessage parameter is set to false (default), updates writeable properties accordingly and call the update callback if the value of a property has changed. If the syncMessage parameter is set to true, the value of the property received by the cloud and the relative last change timestamp are passed to a synchronization callback. The synchronization callback could apply the logic to assign a value to the property choosing between the local value and the cloud one. The synchronization logic also decide if the call to the update callback is necessary.
 
 `decode(uint8_t const * const payload, size_t const length, bool syncMessage = false)`
 
