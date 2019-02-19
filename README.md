@@ -34,7 +34,11 @@ Additional configuration can be added to the property via composition
 
 `.onUpdate(functionPointer)` configures the property to call `functionPointer` when the value is changed by the cloud.
 
-`.onSync(syncFunctionPointer)` configures the property to call `syncFunctionPointer` when as consequence of a connection/reconnection (so after a period passed offline) the value of the property must be synchronized with the one stored in the cloud. The implemetation `syncFunctionPointer()` should contain some synchornization logic.
+`.onSync(syncFunctionPointer)` configures the property to call `syncFunctionPointer` when as consequence of a connection/reconnection (so after a period passed offline) the value of the property must be synchronized with the one stored in the cloud. The implemetation `syncFunctionPointer()` should contain some synchornization logic; standard implementations for this functions are:
+  * AUTO_SYNC: that compares the **cloud** timestamp of the last change with the corresponding **device** timestamp. The property is assigned the value with the higher timestamp. If the **cloud** value is used the `functionPointer` is called
+  * FORCE_CLOUD_SYNC: the property is assigned the value coming from **cloud** regardless of timestamps and **device** value. 
+  * FORCE_DEVICE_SYNC: the device property value is kept. The cloud property value will be updated at the next update cycle.
+  * (*_sync_callback_func)(ArduinoCloudProperty<T> property): `_sync_callback_func` will be executed in order to apply a custom synchronization policy. The `property` object expose several methods which will enable the custom logic to select the appropriate value.
 
 A typical property creation could look like that:
 ```
