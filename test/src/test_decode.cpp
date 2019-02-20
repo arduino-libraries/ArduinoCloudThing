@@ -87,6 +87,21 @@ SCENARIO("Arduino Cloud Properties are decoded", "[ArduinoCloudThing::decode]")
 
       REQUIRE(test == 7);
     }
+    GIVEN("CloudProtocol::V2")
+    {
+      ArduinoCloudThing thing;
+      thing.begin();
+
+      int test = 0;
+      thing.addPropertyReal(test, "test", Permission::ReadWrite);
+
+      /* [{0: "test", 2: -7}] = 81 A2 00 64 74 65 73 74 02 26 */
+      uint8_t const payload[] = {0x81, 0xA2, 0x00, 0x64, 0x74, 0x65, 0x73, 0x74, 0x02, 0x26};
+      int const payload_length = sizeof(payload)/sizeof(uint8_t);
+      thing.decode(payload, payload_length);
+
+      REQUIRE(test == -7);
+    }
   }
 
   /************************************************************************************/
