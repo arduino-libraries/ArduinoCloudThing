@@ -219,10 +219,10 @@ SCENARIO("Arduino Cloud Properties are decoded", "[ArduinoCloudThing::decode]")
         float  float_test = 2.0f;
         String str_test("str_test");
 
-        thing.addPropertyReal(bool_test,  "bool_test",  Permission::ReadWrite).onSync(FORCE_DEVICE_SYNC);
-        thing.addPropertyReal(int_test,   "int_test",   Permission::ReadWrite).onSync(FORCE_DEVICE_SYNC);
-        thing.addPropertyReal(float_test, "float_test", Permission::ReadWrite).onSync(FORCE_DEVICE_SYNC);
-        thing.addPropertyReal(str_test,   "str_test",   Permission::ReadWrite).onSync(FORCE_DEVICE_SYNC);
+        thing.addPropertyReal(bool_test,  "bool_test",  Permission::ReadWrite).onSync(DEVICE_WINS);
+        thing.addPropertyReal(int_test,   "int_test",   Permission::ReadWrite).onSync(DEVICE_WINS);
+        thing.addPropertyReal(float_test, "float_test", Permission::ReadWrite).onSync(DEVICE_WINS);
+        thing.addPropertyReal(str_test,   "str_test",   Permission::ReadWrite).onSync(DEVICE_WINS);
 
         /* [{"n": "bool_test", "vb": true}, {"n": "int_test", "v": 10}, {"n": "float_test", "v": 20.0}, {"n": "str_test", "vs": "hello arduino"}]
          * = 84 A2 61 6E 69 62 6F 6F 6C 5F 74 65 73 74 62 76 62 F5 A2 61 6E 68 69 6E 74 5F 74 65 73 74 61 76 0A A2 61 6E 6A 66 6C 6F 61 74 5F 74 65 73 74 61 76 F9 4D 00 A2 61 6E 68 73 74 72 5F 74 65 73 74 62 76 73 6D 68 65 6C 6C 6F 20 61 72 64 75 69 6E 6F
@@ -309,10 +309,10 @@ SCENARIO("Arduino Cloud Properties are decoded", "[ArduinoCloudThing::decode]")
         float  float_test = 2.0f;
         String str_test("str_test");
 
-        thing.addPropertyReal(bool_test,  "bool_test",  Permission::ReadWrite).onSync(FORCE_CLOUD_SYNC);
-        thing.addPropertyReal(int_test,   "int_test",   Permission::ReadWrite).onSync(FORCE_CLOUD_SYNC);
-        thing.addPropertyReal(float_test, "float_test", Permission::ReadWrite).onSync(FORCE_CLOUD_SYNC);
-        thing.addPropertyReal(str_test,   "str_test",   Permission::ReadWrite).onSync(FORCE_CLOUD_SYNC);
+        thing.addPropertyReal(bool_test,  "bool_test",  Permission::ReadWrite).onSync(CLOUD_WINS);
+        thing.addPropertyReal(int_test,   "int_test",   Permission::ReadWrite).onSync(CLOUD_WINS);
+        thing.addPropertyReal(float_test, "float_test", Permission::ReadWrite).onSync(CLOUD_WINS);
+        thing.addPropertyReal(str_test,   "str_test",   Permission::ReadWrite).onSync(CLOUD_WINS);
 
         /* [{0: "bool_test", 4: true}, {0: "int_test", 2: 10}, {0: "float_test", 2: 20.0}, {0: "str_test", 3: "hello arduino"}]
          * = 84 A2 00 69 62 6F 6F 6C 5F 74 65 73 74 04 F5 A2 00 68 69 6E 74 5F 74 65 73 74 02 0A A2 00 6A 66 6C 6F 61 74 5F 74 65 73 74 02 F9 4D 00 A2 00 68 73 74 72 5F 74 65 73 74 03 6D 68 65 6C 6C 6F 20 61 72 64 75 69 6E 6F

@@ -123,7 +123,7 @@ static bool change_callback_called = false;
 
 void auto_sync_callback(ArduinoCloudProperty<bool> property)
 {
-  AUTO_SYNC(property);
+  MOST_RECENT_WINS(property);
   sync_callback_called = true;
 }
 
@@ -192,7 +192,7 @@ SCENARIO("After a connection/reconnection an incoming cbor payload is processed 
 
 void force_device_sync_callback(ArduinoCloudProperty<bool> property)
 {
-  FORCE_DEVICE_SYNC(property);
+  DEVICE_WINS(property);
   sync_callback_called = true;
 }
 
@@ -227,7 +227,7 @@ SCENARIO("After a connection/reconnection an incoming cbor payload is processed 
 
 void force_cloud_sync_callback(ArduinoCloudProperty<bool> property)
 {
-  FORCE_CLOUD_SYNC(property);
+  CLOUD_WINS(property);
   sync_callback_called = true;
 }
 
