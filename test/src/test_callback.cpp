@@ -132,7 +132,7 @@ void change_callback()
   change_callback_called = true;
 }
 
-SCENARIO("After a connection/reconnection an incoming cbor payload is processed and the synchronization callback is executed. The sync callback apply the AUTO_SYNC policy (the most recent value between the local one and the cloud one is finally assigned to the property). The onUpdate function is called if the cloud value is the most recent one. In this scenario the most updated value is the cloud one.")
+SCENARIO("After a connection/reconnection an incoming cbor payload is processed and the synchronization callback is executed. The sync callback applies the AUTO_SYNC policy (the most recent value between the local one and the cloud one is finally assigned to the property). The onUpdate function is called if the cloud value is the most recent one. In this scenario the most updated value is the cloud one.")
 {
   GIVEN("CloudProtocol::V2")
   {
@@ -196,7 +196,7 @@ void force_device_sync_callback(ArduinoCloudProperty<bool> property)
   sync_callback_called = true;
 }
 
-SCENARIO("After a connection/reconnection an incoming cbor payload is processed and the synchronization callback is executed. The sync callback apply the FORCE_DEVICE_SYNC policy (the property keep the local value and, if the cloud value is different from the local one, the value is propagated to the cloud). The onUpdate function is not executed")
+SCENARIO("After a connection/reconnection an incoming cbor payload is processed and the synchronization callback is executed. The sync callback applies the FORCE_DEVICE_SYNC policy (the property keeps the local value and, if the cloud value is different from the local one, the value is propagated to the cloud). The onUpdate function is not executed")
 {
   GIVEN("CloudProtocol::V2")
   {
@@ -231,7 +231,7 @@ void force_cloud_sync_callback(ArduinoCloudProperty<bool> property)
   sync_callback_called = true;
 }
 
-SCENARIO("After a connection/reconnection an incoming cbor payload is processed and the synchronization callback is executed. The sync callback apply the FORCE_CLOUD_SYNC policy (the property always assume the value incoming from the broker message). The onUpdate function is executed only if the local value of the property was different from the one taken from the incoming message")
+SCENARIO("After a connection/reconnection an incoming cbor payload is processed and the synchronization callback is executed. The sync callback applies the FORCE_CLOUD_SYNC policy (the property always assumes the value incoming from the broker message). The onUpdate function is executed only if the local value of the property was different from the one taken from the incoming message")
 {
   GIVEN("CloudProtocol::V2")
   {
@@ -259,7 +259,7 @@ SCENARIO("After a connection/reconnection an incoming cbor payload is processed 
 
 /**************************************************************************************/
 
-SCENARIO("After a connection/reconnection an incoming cbor payload is processed. Any synchoniation function is passed to the property so the value in the incoming message is discarded")
+SCENARIO("After a connection/reconnection an incoming cbor payload is processed. Any synchronization function is passed to the property so the value in the incoming message is discarded")
 {
   GIVEN("CloudProtocol::V2")
   {
