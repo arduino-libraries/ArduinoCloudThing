@@ -21,7 +21,7 @@ SCENARIO("A Arduino cloud property is marked 'write only'", "[ArduinoCloudThing:
   ArduinoCloudThing thing;
   thing.begin();
 
-  int test = 0;
+  CloudInt test = 0;
   thing.addPropertyReal(test, "test", Permission::Write);
 
   REQUIRE(encode(thing).size() == 0); /* Since 'test' is 'write only' it should not be encoded */

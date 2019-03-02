@@ -33,10 +33,8 @@ set(TEST_SRCS
   src/test_writeOnly.cpp
   src/TestUtil.cpp
   
-  ../src/ArduinoCloudPropertyContainer.cpp
-  ../src/ArduinoCloudPropertyContainer.ipp
-  ../src/ArduinoCloudProperty.ipp
   ../src/ArduinoCloudThing.cpp
+  ../src/ArduinoCloudProperty.cpp
   ../src/lib/tinycbor/src/cborencoder.c
   ../src/lib/tinycbor/src/cborencoder_close_container_checked.c
   ../src/lib/tinycbor/src/cborerrorstrings.c

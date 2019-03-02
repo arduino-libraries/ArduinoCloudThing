@@ -18,7 +18,10 @@
 std::vector<uint8_t> encode(ArduinoCloudThing & thing) {
   uint8_t buf[200] = {0};
   int const bytes_buf = thing.encode(buf, 200);
-  return std::vector<uint8_t>(buf, buf + bytes_buf);
+  if (bytes_buf == -1) 
+    return std::vector<uint8_t>();
+  else 
+    return std::vector<uint8_t>(buf, buf + bytes_buf);
 }
 
 void print(std::vector<uint8_t> const & vect) {
