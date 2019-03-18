@@ -22,6 +22,7 @@ set(TEST_SRCS
   src/Arduino.cpp
   
   src/main.cpp
+  src/test_addPropertyReal.cpp
   src/test_callback.cpp
   src/test_decode.cpp
   src/test_encode.cpp
