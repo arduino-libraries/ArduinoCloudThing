@@ -23,7 +23,6 @@ SCENARIO("A Arduino cloud property is published on value change", "[ArduinoCloud
   {
     ArduinoCloudThing thing;
     thing.begin();
-    REQUIRE(encode(thing).size() != 0); /* Encoding the 'status' property */
 
     int       test  = 10;
     int const DELTA = 6;

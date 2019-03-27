@@ -23,7 +23,6 @@ SCENARIO("A Arduino cloud property is published periodically", "[ArduinoCloudThi
   {
     ArduinoCloudThing thing;
     thing.begin();
-    REQUIRE(encode(thing).size() != 0); /* Encoding the 'status' property */
 
     bool test = true;
     unsigned long const PUBLISH_INTERVAL_SEC = 1 * SECONDS;
