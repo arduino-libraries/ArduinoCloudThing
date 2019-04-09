@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2019 Arduino.  All rights reserved.
- */
+   Copyright (c) 2019 Arduino.  All rights reserved.
+*/
 
 /**************************************************************************************
- * INCLUDE/MAIN
+   INCLUDE/MAIN
  **************************************************************************************/
 
 #define CATCH_CONFIG_MAIN

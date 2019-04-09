@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2019 Arduino.  All rights reserved.
- */
+   Copyright (c) 2019 Arduino.  All rights reserved.
+*/
 
 /**************************************************************************************
- * INCLUDE
+   INCLUDE
  **************************************************************************************/
 
 #include <catch.hpp>
@@ -12,11 +12,10 @@
 #include <ArduinoCloudThing.h>
 
 /**************************************************************************************
- * TEST CODE
+   TEST CODE
  **************************************************************************************/
 
-SCENARIO("A Arduino cloud property is marked 'write only'", "[ArduinoCloudThing::encode]")
-{
+SCENARIO("A Arduino cloud property is marked 'write only'", "[ArduinoCloudThing::encode]") {
   /************************************************************************************/
 
   ArduinoCloudThing thing;

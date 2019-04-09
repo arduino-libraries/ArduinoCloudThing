@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2019 Arduino.  All rights reserved.
- */
+   Copyright (c) 2019 Arduino.  All rights reserved.
+*/
 
 /**************************************************************************************
- * INCLUDE
+   INCLUDE
  **************************************************************************************/
 
 #include <TestUtil.h>
@@ -12,20 +12,17 @@
 #include <iostream>
 
 /**************************************************************************************
- * PUBLIC FUNCTIONS
+   PUBLIC FUNCTIONS
  **************************************************************************************/
 
-std::vector<uint8_t> encode(ArduinoCloudThing & thing)
-{
+std::vector<uint8_t> encode(ArduinoCloudThing & thing) {
   uint8_t buf[200] = {0};
   int const bytes_buf = thing.encode(buf, 200);
   return std::vector<uint8_t>(buf, buf + bytes_buf);
 }
 
-void print(std::vector<uint8_t> const & vect)
-{
-  for(auto i = vect.begin(); i != vect.end(); i++)
-  {
+void print(std::vector<uint8_t> const & vect) {
+  for (auto i = vect.begin(); i != vect.end(); i++) {
     std::cout << std::uppercase
               << std::hex
               << std::setw(2)
