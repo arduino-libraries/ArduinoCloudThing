@@ -45,3 +45,11 @@ matrix:
       script:
         # check code formatting
         - find . -regextype posix-extended -path './.git' -prune -or -path './src/lib' -prune -or -path './test/external' -prune -or \( -iregex '.*\.((ino)|(h)|(hpp)|(hh)|(hxx)|(h\+\+)|(cpp)|(cc)|(cxx)|(c\+\+)|(cp)|(c)|(ipp)|(ii)|(ixx)|(inl)|(tpp)|(txx)|(tpl))$' -and -type f \) -print0 | xargs -0 -L1 bash -c 'if ! diff $0 <(astyle --options=${HOME}/astyle/examples_formatter.conf --dry-run < $0); then echo "Non-compliant code formatting in $0"; false; fi'
+
+notifications:
+  webhooks:
+    urls:
+      # TravisBuddy will automatically comment on any PR that results in a failed Travis CI build, which will cause the PR author to get a notification
+      - https://www.travisbuddy.com/
+    on_success: never
+    on_failure: always
