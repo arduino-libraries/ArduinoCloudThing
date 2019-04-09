@@ -1,23 +1,47 @@
 language: cpp
 sudo: enabled
 
-install:
-  - sudo apt-get install lcov
+matrix:
+  include:
+    - env:
+        - NAME=Test
 
-before_script:
-  - cd test && mkdir build && cd build
+      install:
+        - sudo apt-get install lcov
 
-script:
-  - cmake ..
-  - make
+      before_script:
+        - cd test && mkdir build && cd build
 
-after_success:
-  - lcov --directory . --zerocounters
-  - bin/testArduinoCloudThing
-  - lcov --directory . --capture --output-file coverage.info
-  - lcov --remove coverage.info 'test/*' '/usr/*' 'lib/*' --output-file coverage.info
-  - lcov --list coverage.info
-  - bash <(curl -s https://codecov.io/bash) -f coverage.info
-  - cd ..
-  - rm -rf build
+      script:
+        - cmake ..
+        - make
 
+      after_success:
+        - lcov --directory . --zerocounters
+        - bin/testArduinoCloudThing
+        - lcov --directory . --capture --output-file coverage.info
+        - lcov --remove coverage.info 'test/*' '/usr/*' 'lib/*' --output-file coverage.info
+        - lcov --list coverage.info
+        - bash <(curl -s https://codecov.io/bash) -f coverage.info
+        - cd ..
+        - rm -rf build
+
+    - env:
+        - NAME=Code Formatting Check
+
+      install:
+        # install Artistic Style code formatter tool: http://astyle.sourceforge.net
+        - |
+          mkdir "${HOME}/astyle";
+          wget --no-verbose --output-document="${HOME}/astyle/astyle.tar.gz" "https://iweb.dl.sourceforge.net/project/astyle/astyle/astyle%203.1/astyle_3.1_linux.tar.gz";
+          tar --extract --file="${HOME}/astyle/astyle.tar.gz" --directory="${HOME}/astyle";
+          cd "${HOME}/astyle/astyle/build/gcc";
+          make;
+          export PATH=$PWD/bin:$PATH;
+          cd "$TRAVIS_BUILD_DIR"
+        # download Arduino's Artistic Style configuration file
+        - wget --directory-prefix="${HOME}/astyle" https://raw.githubusercontent.com/arduino/Arduino/master/build/shared/examples_formatter.conf
+
+      script:
+        # check code formatting
+        - find . -regextype posix-extended -path './.git' -prune -or -path './src/lib' -prune -or -path './test/external' -prune -or \( -iregex '.*\.((ino)|(h)|(hpp)|(hh)|(hxx)|(h\+\+)|(cpp)|(cc)|(cxx)|(c\+\+)|(cp)|(c)|(ipp)|(ii)|(ixx)|(inl)|(tpp)|(txx)|(tpl))$' -and -type f \) -print0 | xargs -0 -L1 bash -c 'if ! diff $0 <(astyle --options=${HOME}/astyle/examples_formatter.conf --dry-run < $0); then echo "Non-compliant code formatting in $0"; false; fi'
