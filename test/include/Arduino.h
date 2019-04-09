@@ -1,24 +1,24 @@
 /*
- * Copyright (c) 2019 Arduino.  All rights reserved.
- */
+   Copyright (c) 2019 Arduino.  All rights reserved.
+*/
 
 #ifndef TEST_ARDUINO_H_
 #define TEST_ARDUINO_H_
 
 /******************************************************************************
- * INCLUDE
+   INCLUDE
  ******************************************************************************/
 
 #include <string>
 
 /******************************************************************************
- * TYPEDEF
+   TYPEDEF
  ******************************************************************************/
 
 typedef std::string String;
 
 /******************************************************************************
- * FUNCTION PROTOTYPES
+   FUNCTION PROTOTYPES
  ******************************************************************************/
 
 void          set_millis(unsigned long const millis);

@@ -1,29 +1,27 @@
 /*
- * Copyright (c) 2019 Arduino.  All rights reserved.
- */
+   Copyright (c) 2019 Arduino.  All rights reserved.
+*/
 
 /******************************************************************************
- * INCLUDE
+   INCLUDE
  ******************************************************************************/
 
 #include <Arduino.h>
 
 /******************************************************************************
- * GLOBAL VARIABLES
+   GLOBAL VARIABLES
  ******************************************************************************/
 
 static unsigned long current_millis = 0;
 
 /******************************************************************************
- * PUBLIC FUNCTIONS
+   PUBLIC FUNCTIONS
  ******************************************************************************/
 
-void set_millis(unsigned long const millis)
-{
+void set_millis(unsigned long const millis) {
   current_millis = millis;
 }
 
-unsigned long millis()
-{
+unsigned long millis() {
   return current_millis;
 }

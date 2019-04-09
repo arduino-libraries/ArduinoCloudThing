@@ -1,12 +1,12 @@
 /*
- * Copyright (c) 2019 Arduino.  All rights reserved.
- */
+   Copyright (c) 2019 Arduino.  All rights reserved.
+*/
 
 #ifndef INCLUDE_TESTUTIL_H_
 #define INCLUDE_TESTUTIL_H_
 
 /**************************************************************************************
- * INCLUDE
+   INCLUDE
  **************************************************************************************/
 
 #include <ArduinoCloudThing.h>
@@ -14,7 +14,7 @@
 #include <vector>
 
 /**************************************************************************************
- * PROTOTYPES
+   PROTOTYPES
  **************************************************************************************/
 
 std::vector<uint8_t> encode(ArduinoCloudThing & thing);
