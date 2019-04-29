@@ -98,8 +98,7 @@ SCENARIO("A (boolean) property is manipulated in the callback to its origin stat
 static bool sync_callback_called = false;
 static bool change_callback_called = false;
 
-void auto_sync_callback(ArduinoCloudProperty& property)
-{
+void auto_sync_callback(ArduinoCloudProperty& property) {
   MOST_RECENT_WINS(property);
   sync_callback_called = true;
 }
@@ -108,10 +107,8 @@ void change_callback() {
   change_callback_called = true;
 }
 
-SCENARIO("After a connection/reconnection an incoming cbor payload is processed and the synchronization callback is executed. The sync callback applies the AUTO_SYNC policy (the most recent value between the local one and the cloud one is finally assigned to the property). The onUpdate function is called if the cloud value is the most recent one. In this scenario the most updated value is the cloud one.")
-{
-  GIVEN("CloudProtocol::V2")
-  {
+SCENARIO("After a connection/reconnection an incoming cbor payload is processed and the synchronization callback is executed. The sync callback applies the AUTO_SYNC policy (the most recent value between the local one and the cloud one is finally assigned to the property). The onUpdate function is called if the cloud value is the most recent one. In this scenario the most updated value is the cloud one.") {
+  GIVEN("CloudProtocol::V2") {
     CloudBool test = false;
     sync_callback_called = false;
     change_callback_called = false;
@@ -137,10 +134,8 @@ SCENARIO("After a connection/reconnection an incoming cbor payload is processed 
 
 /**************************************************************************************/
 
-SCENARIO("After a connection/reconnection an incoming cbor payload is processed and the synchronization callback is executed. The sync callback apply the AUTO_SYNC policy (the most recent value between the local one and the cloud one is finally assigned to the property). The onUpdate function is called if the cloud value is the most recent one. In this scenario the most updated value is the local one.")
-{
-  GIVEN("CloudProtocol::V2")
-  {
+SCENARIO("After a connection/reconnection an incoming cbor payload is processed and the synchronization callback is executed. The sync callback apply the AUTO_SYNC policy (the most recent value between the local one and the cloud one is finally assigned to the property). The onUpdate function is called if the cloud value is the most recent one. In this scenario the most updated value is the local one.") {
+  GIVEN("CloudProtocol::V2") {
     CloudBool test = true;
     sync_callback_called = false;
     change_callback_called = false;
@@ -164,10 +159,8 @@ SCENARIO("After a connection/reconnection an incoming cbor payload is processed 
   }
 }
 
-SCENARIO("Primitive property: After a connection/reconnection an incoming cbor payload is processed and the synchronization callback is executed. The sync callback applies the AUTO_SYNC policy (the most recent value between the local one and the cloud one is finally assigned to the property). The onUpdate function is called if the cloud value is the most recent one. In this scenario the most updated value is the cloud one.")
-{
-  GIVEN("CloudProtocol::V2")
-  {
+SCENARIO("Primitive property: After a connection/reconnection an incoming cbor payload is processed and the synchronization callback is executed. The sync callback applies the AUTO_SYNC policy (the most recent value between the local one and the cloud one is finally assigned to the property). The onUpdate function is called if the cloud value is the most recent one. In this scenario the most updated value is the cloud one.") {
+  GIVEN("CloudProtocol::V2") {
     bool test = true;
     ArduinoCloudProperty *p = new CloudWrapperBool(test);
     sync_callback_called = false;
@@ -183,8 +176,8 @@ SCENARIO("Primitive property: After a connection/reconnection an incoming cbor p
     p->setLastLocalChangeTimestamp(1550138809);
 
     /* [{-3: 1550138810.00, 0: "test", 4: true}] = 81 A3 22 FB 41 D7 19 4F 6E 80 00 00 00 64 74 65 73 74 04 F5 */
-    uint8_t const payload[] = {0x81 ,0xA3, 0x22, 0xFB, 0x41, 0xD7, 0x19, 0x4F, 0x6E, 0x80, 0x00, 0x00, 0x00, 0x64, 0x74, 0x65, 0x73, 0x74, 0x04, 0xF5};
-    int const payload_length = sizeof(payload)/sizeof(uint8_t);
+    uint8_t const payload[] = {0x81, 0xA3, 0x22, 0xFB, 0x41, 0xD7, 0x19, 0x4F, 0x6E, 0x80, 0x00, 0x00, 0x00, 0x64, 0x74, 0x65, 0x73, 0x74, 0x04, 0xF5};
+    int const payload_length = sizeof(payload) / sizeof(uint8_t);
     thing.decode(payload, payload_length, true);
 
     REQUIRE(sync_callback_called == true);
@@ -196,10 +189,8 @@ SCENARIO("Primitive property: After a connection/reconnection an incoming cbor p
 
 /**************************************************************************************/
 
-SCENARIO("Primitive property: After a connection/reconnection an incoming cbor payload is processed and the synchronization callback is executed. The sync callback apply the AUTO_SYNC policy (the most recent value between the local one and the cloud one is finally assigned to the property). The onUpdate function is called if the cloud value is the most recent one. In this scenario the most updated value is the local one.")
-{
-  GIVEN("CloudProtocol::V2")
-  {
+SCENARIO("Primitive property: After a connection/reconnection an incoming cbor payload is processed and the synchronization callback is executed. The sync callback apply the AUTO_SYNC policy (the most recent value between the local one and the cloud one is finally assigned to the property). The onUpdate function is called if the cloud value is the most recent one. In this scenario the most updated value is the local one.") {
+  GIVEN("CloudProtocol::V2") {
     bool test = true;
     ArduinoCloudProperty *p = new CloudWrapperBool(test);
     sync_callback_called = false;
@@ -215,8 +206,8 @@ SCENARIO("Primitive property: After a connection/reconnection an incoming cbor p
     p->setLastLocalChangeTimestamp(1550138811);
 
     /* [{-3: 1550138810.00, 0: "test", 4: true}] = 81 A3 22 FB 41 D7 19 4F 6E 80 00 00 00 64 74 65 73 74 04 F5 */
-    uint8_t const payload[] = {0x81 ,0xA3, 0x22, 0xFB, 0x41, 0xD7, 0x19, 0x4F, 0x6E, 0x80, 0x00, 0x00, 0x00, 0x64, 0x74, 0x65, 0x73, 0x74, 0x04, 0xF5};
-    int const payload_length = sizeof(payload)/sizeof(uint8_t);
+    uint8_t const payload[] = {0x81, 0xA3, 0x22, 0xFB, 0x41, 0xD7, 0x19, 0x4F, 0x6E, 0x80, 0x00, 0x00, 0x00, 0x64, 0x74, 0x65, 0x73, 0x74, 0x04, 0xF5};
+    int const payload_length = sizeof(payload) / sizeof(uint8_t);
     thing.decode(payload, payload_length, true);
 
     REQUIRE(sync_callback_called == true);
@@ -226,10 +217,8 @@ SCENARIO("Primitive property: After a connection/reconnection an incoming cbor p
   }
 }
 
-SCENARIO("Object property: After a connection/reconnection an incoming cbor payload is processed and the synchronization callback is executed. The sync callback applies the AUTO_SYNC policy (the most recent value between the local one and the cloud one is finally assigned to the property). The onUpdate function is called if the cloud value is the most recent one. In this scenario the most updated value is the cloud one.")
-{
-  GIVEN("CloudProtocol::V2")
-  {
+SCENARIO("Object property: After a connection/reconnection an incoming cbor payload is processed and the synchronization callback is executed. The sync callback applies the AUTO_SYNC policy (the most recent value between the local one and the cloud one is finally assigned to the property). The onUpdate function is called if the cloud value is the most recent one. In this scenario the most updated value is the cloud one.") {
+  GIVEN("CloudProtocol::V2") {
     CloudLocation location_test = CloudLocation(0, 1);
     sync_callback_called = false;
     change_callback_called = false;
@@ -242,15 +231,15 @@ SCENARIO("Object property: After a connection/reconnection an incoming cbor payl
 
     /* [{-3: 1550138810.00, 0: "test:lat", 3: 2},{0: "test:lon", 3: 3}] = 82 A3 22 FB 41 D7 19 4F 6E 80 00 00 00 68 74 65 73 74 3A 6C 61 74 02 02 A2 00 68 74 65 73 74 3A 6C 6F 6E 02 03*/
     uint8_t const payload[] = { 0x82, 0xA3, 0x22, 0xFB, 0x41, 0xD7, 0x19, 0x4F, 0x6E, 0x80, 0x00, 0x00, 0x00, 0x68, 0x74, 0x65, 0x73, 0x74, 0x3A, 0x6C, 0x61, 0x74, 0x02, 0x02, 0xA2, 0x00, 0x68, 0x74, 0x65, 0x73, 0x74, 0x3A, 0x6C, 0x6F, 0x6E, 0x02, 0x03 };
-    
-    int const payload_length = sizeof(payload)/sizeof(uint8_t);
+
+    int const payload_length = sizeof(payload) / sizeof(uint8_t);
     thing.decode(payload, payload_length, true);
 
     REQUIRE(sync_callback_called == true);
     REQUIRE(change_callback_called == true);
 
     Location location_compare = Location(2, 3);
-	Location value_location_test = location_test.getValue();
+    Location value_location_test = location_test.getValue();
     bool verify = (value_location_test == location_compare);
 
     REQUIRE(verify);
@@ -259,10 +248,8 @@ SCENARIO("Object property: After a connection/reconnection an incoming cbor payl
 
 /**************************************************************************************/
 
-SCENARIO("Object property: After a connection/reconnection an incoming cbor payload is processed and the synchronization callback is executed. The sync callback apply the AUTO_SYNC policy (the most recent value between the local one and the cloud one is finally assigned to the property). The onUpdate function is called if the cloud value is the most recent one. In this scenario the most updated value is the local one.")
-{
-  GIVEN("CloudProtocol::V2")
-  {
+SCENARIO("Object property: After a connection/reconnection an incoming cbor payload is processed and the synchronization callback is executed. The sync callback apply the AUTO_SYNC policy (the most recent value between the local one and the cloud one is finally assigned to the property). The onUpdate function is called if the cloud value is the most recent one. In this scenario the most updated value is the local one.") {
+  GIVEN("CloudProtocol::V2") {
     CloudLocation location_test = CloudLocation(0, 1);
     sync_callback_called = false;
     change_callback_called = false;
@@ -275,15 +262,15 @@ SCENARIO("Object property: After a connection/reconnection an incoming cbor payl
 
     /* [{-3: 1550138810.00, 0: "test:lat", 3: 2},{0: "test:lon", 3: 3}] = 82 A3 22 FB 41 D7 19 4F 6E 80 00 00 00 68 74 65 73 74 3A 6C 61 74 02 02 A2 00 68 74 65 73 74 3A 6C 6F 6E 02 03*/
     uint8_t const payload[] = { 0x82, 0xA3, 0x22, 0xFB, 0x41, 0xD7, 0x19, 0x4F, 0x6E, 0x80, 0x00, 0x00, 0x00, 0x68, 0x74, 0x65, 0x73, 0x74, 0x3A, 0x6C, 0x61, 0x74, 0x02, 0x02, 0xA2, 0x00, 0x68, 0x74, 0x65, 0x73, 0x74, 0x3A, 0x6C, 0x6F, 0x6E, 0x02, 0x03 };
-    
-    int const payload_length = sizeof(payload)/sizeof(uint8_t);
+
+    int const payload_length = sizeof(payload) / sizeof(uint8_t);
     thing.decode(payload, payload_length, true);
 
     REQUIRE(sync_callback_called == true);
     REQUIRE(change_callback_called == false);
 
     Location location_compare = Location(0, 1);
-	Location value_location_test = location_test.getValue();
+    Location value_location_test = location_test.getValue();
     bool verify = (value_location_test == location_compare);
 
     REQUIRE(verify);
@@ -292,8 +279,7 @@ SCENARIO("Object property: After a connection/reconnection an incoming cbor payl
 
 /**************************************************************************************/
 
-void force_device_sync_callback(ArduinoCloudProperty& property)
-{
+void force_device_sync_callback(ArduinoCloudProperty& property) {
   DEVICE_WINS(property);
   sync_callback_called = true;
 }
@@ -325,8 +311,7 @@ SCENARIO("After a connection/reconnection an incoming cbor payload is processed 
 
 /**************************************************************************************/
 
-void force_cloud_sync_callback(ArduinoCloudProperty& property)
-{
+void force_cloud_sync_callback(ArduinoCloudProperty& property) {
   CLOUD_WINS(property);
   sync_callback_called = true;
 }
