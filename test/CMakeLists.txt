@@ -32,7 +32,8 @@ set(TEST_SRCS
   src/test_readOnly.cpp
   src/test_writeOnly.cpp
   src/TestUtil.cpp
-  
+  src/test_CloudColor.cpp
+
   ../src/ArduinoCloudThing.cpp
   ../src/ArduinoCloudProperty.cpp
   ../src/lib/tinycbor/src/cborencoder.c
