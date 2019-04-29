@@ -10,6 +10,10 @@
 
 #include <TestUtil.h>
 #include <ArduinoCloudThing.h>
+#include "types/CloudWrapperBool.h"
+#include "types/CloudWrapperFloat.h"
+#include "types/CloudWrapperInt.h"
+#include "types/CloudWrapperString.h"
 
 /**************************************************************************************
    TEST CODE
@@ -108,6 +112,58 @@ SCENARIO("Arduino Cloud Properties are decoded", "[ArduinoCloudThing::decode]") 
 
   /************************************************************************************/
 
+  WHEN("A Location property is changed via CBOR message") {
+    GIVEN("CloudProtocol::V2") {
+      ArduinoCloudThing thing;
+      thing.begin();
+
+      CloudLocation location_test = CloudLocation(0, 1);
+      thing.addPropertyReal(location_test, "test", Permission::ReadWrite);
+
+      /* [{0: "test:lat", 3: 2},{0: "test:lon", 3: 3}] = 82 A2 00 68 74 65 73 74 3A 6C 61 74 02 02 A2 00 68 74 65 73 74 3A 6C 6F 6E 02 03*/
+      uint8_t const payload[] = { 0x82, 0xA2, 0x00, 0x68, 0x74, 0x65, 0x73, 0x74, 0x3A, 0x6C, 0x61, 0x74, 0x02, 0x02, 0xA2, 0x00, 0x68, 0x74, 0x65, 0x73, 0x74, 0x3A, 0x6C, 0x6F, 0x6E, 0x02, 0x03 };
+      thing.decode(payload, sizeof(payload) / sizeof(uint8_t));
+      Location location_compare = Location(2, 3);
+      Location value_location_test = location_test.getValue();
+      bool verify = (value_location_test == location_compare);
+      REQUIRE(verify);
+    }
+  }
+
+  /************************************************************************************/
+
+  WHEN("A Color property is changed via CBOR message") {
+    GIVEN("CloudProtocol::V2") {
+      ArduinoCloudThing thing;
+      thing.begin();
+
+      CloudColor color_test = CloudColor(0.0, 0.0, 0.0);
+
+      thing.addPropertyReal(color_test, "test", Permission::ReadWrite);
+
+      /* [{0: "test:hue", 2: 2.0},{0: "test:sat", 2: 2.0},{0: "test:bri", 2: 2.0}] = 83 A2 00 68 74 65 73 74 3A 68 75 65 02 FA 40 00 00 00 A2 00 68 74 65 73 74 3A 73 61 74 02 FA 40 00 00 00 A2 00 68 74 65 73 74 3A 62 72 69 02 FA 40 00 00 00 */
+      uint8_t const payload[] = {0x83, 0xA2, 0x00, 0x68, 0x74, 0x65, 0x73, 0x74, 0x3A, 0x68, 0x75, 0x65, 0x02, 0xFA, 0x40, 0x00, 0x00, 0x00, 0xA2, 0x00, 0x68, 0x74, 0x65, 0x73, 0x74, 0x3A, 0x73, 0x61, 0x74, 0x02, 0xFA, 0x40, 0x00, 0x00, 0x00, 0xA2, 0x00, 0x68, 0x74, 0x65, 0x73, 0x74, 0x3A, 0x62, 0x72, 0x69, 0x02, 0xFA, 0x40, 0x00, 0x00, 0x00 };
+      thing.decode(payload, sizeof(payload) / sizeof(uint8_t));
+
+      Color color_compare = Color(2.0, 2.0, 2.0);
+      Color value_color_test = color_test.getValue();
+      bool verify = (value_color_test == color_compare);
+
+      CloudColor Color_RGB = CloudColor(0.0, 0.0, 0.0);
+      Color c = Color_RGB.getValue();
+      c.setColorRGB(20, 50, 70);
+      Color_RGB = c;
+      uint8_t r, g, b;
+      c.getRGB(r, g, b);
+      bool rgb = 20 == r && 50 == g && 70 == b;
+
+      REQUIRE(rgb);
+      REQUIRE(verify);
+    }
+  }
+
+  /************************************************************************************/
+
   WHEN("Multiple properties is changed via CBOR message") {
     GIVEN("CloudProtocol::V2") {
       WHEN("Multiple properties of different type are changed via CBOR message") {
@@ -168,14 +224,50 @@ SCENARIO("Arduino Cloud Properties are decoded", "[ArduinoCloudThing::decode]") 
 
       /********************************************************************************/
 
+      WHEN("Multiple primitive properties of different type are synchronized via CBOR message. FORCE_CLOUD_SYNC is passed as synchronization function and as a consequence values contained in the incoming message are stored in the properties") {
+        ArduinoCloudThing thing;
+        thing.begin();
+
+        int    int_test = 1;
+        bool   bool_test = false;
+        float  float_test = 2.0f;
+        String str_test;
+        str_test = "str_test";
+
+        ArduinoCloudProperty *i = new CloudWrapperInt(int_test);
+        ArduinoCloudProperty *b = new CloudWrapperBool(bool_test);
+        ArduinoCloudProperty *f = new CloudWrapperFloat(float_test);
+        ArduinoCloudProperty *s = new CloudWrapperString(str_test);
+
+        thing.addPropertyReal(*b,  "bool_test",  Permission::ReadWrite).onSync(CLOUD_WINS);
+        thing.addPropertyReal(*i,   "int_test",   Permission::ReadWrite).onSync(CLOUD_WINS);
+        thing.addPropertyReal(*f, "float_test", Permission::ReadWrite).onSync(CLOUD_WINS);
+        thing.addPropertyReal(*s,   "str_test",   Permission::ReadWrite).onSync(CLOUD_WINS);
+
+        thing.updateTimestampOnLocallyChangedProperties();
+
+        /* [{0: "bool_test", 4: true}, {0: "int_test", 2: 10}, {0: "float_test", 2: 20.0}, {0: "str_test", 3: "hello arduino"}]
+           = 84 A2 00 69 62 6F 6F 6C 5F 74 65 73 74 04 F5 A2 00 68 69 6E 74 5F 74 65 73 74 02 0A A2 00 6A 66 6C 6F 61 74 5F 74 65 73 74 02 F9 4D 00 A2 00 68 73 74 72 5F 74 65 73 74 03 6D 68 65 6C 6C 6F 20 61 72 64 75 69 6E 6F
+        */
+        uint8_t const payload[] = {0x84, 0xA2, 0x00, 0x69, 0x62, 0x6F, 0x6F, 0x6C, 0x5F, 0x74, 0x65, 0x73, 0x74, 0x04, 0xF5, 0xA2, 0x00, 0x68, 0x69, 0x6E, 0x74, 0x5F, 0x74, 0x65, 0x73, 0x74, 0x02, 0x0A, 0xA2, 0x00, 0x6A, 0x66, 0x6C, 0x6F, 0x61, 0x74, 0x5F, 0x74, 0x65, 0x73, 0x74, 0x02, 0xF9, 0x4D, 0x00, 0xA2, 0x00, 0x68, 0x73, 0x74, 0x72, 0x5F, 0x74, 0x65, 0x73, 0x74, 0x03, 0x6D, 0x68, 0x65, 0x6C, 0x6C, 0x6F, 0x20, 0x61, 0x72, 0x64, 0x75, 0x69, 0x6E, 0x6F};
+        thing.decode(payload, sizeof(payload) / sizeof(uint8_t), true);
+
+        REQUIRE(bool_test  == true);
+        REQUIRE(int_test   == 10);
+        REQUIRE(float_test == Approx(20.0).epsilon(0.01));
+        REQUIRE(str_test   == "hello arduino");
+      }
+
+      /********************************************************************************/
+
       WHEN("Multiple String properties are changed via CBOR message") {
         ArduinoCloudThing thing;
         thing.begin();
 
         CloudString str_1("hello"),
-               str_2("arduino"),
-               str_3("cloud"),
-               str_4("test");
+                    str_2("arduino"),
+                    str_3("cloud"),
+                    str_4("test");
 
         thing.addPropertyReal(str_1, "str_1", Permission::ReadWrite);
         thing.addPropertyReal(str_2, "str_2", Permission::ReadWrite);

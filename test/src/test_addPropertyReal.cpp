@@ -23,9 +23,8 @@ SCENARIO("The same arduino cloud properties are added multiple times", "[Arduino
 
     ArduinoCloudProperty * bool_property_ptr_1 = &thing.addPropertyReal(bool_property, "bool_property", Permission::ReadWrite);
     ArduinoCloudProperty * bool_property_ptr_2 = &thing.addPropertyReal(bool_property, "bool_property", Permission::ReadWrite);
-    THEN("No new property is added and the first added property is returned instead of a new one")
-    {
-      REQUIRE(bool_property_ptr_1 == bool_property_ptr_2);      
+    THEN("No new property is added and the first added property is returned instead of a new one") {
+      REQUIRE(bool_property_ptr_1 == bool_property_ptr_2);
     }
   }
 
@@ -55,9 +54,8 @@ SCENARIO("The same arduino cloud properties are added multiple times", "[Arduino
 
     ArduinoCloudProperty * float_property_ptr_1 = &thing.addPropertyReal(float_property, "float_property", Permission::ReadWrite);
     ArduinoCloudProperty * float_property_ptr_2 = &thing.addPropertyReal(float_property, "float_property", Permission::ReadWrite);
-    
-    THEN("No new property is added and the first added property is returned instead of a new one")
-    {
+
+    THEN("No new property is added and the first added property is returned instead of a new one") {
       REQUIRE(float_property_ptr_1 == float_property_ptr_2);
     }
   }
@@ -72,9 +70,8 @@ SCENARIO("The same arduino cloud properties are added multiple times", "[Arduino
 
     ArduinoCloudProperty * str_property_ptr_1 = &thing.addPropertyReal(str_property, "str_property", Permission::ReadWrite);
     ArduinoCloudProperty * str_property_ptr_2 = &thing.addPropertyReal(str_property, "str_property", Permission::ReadWrite);
-    
-    THEN("No new property is added and the first added property is returned instead of a new one")
-    {
+
+    THEN("No new property is added and the first added property is returned instead of a new one") {
       REQUIRE(str_property_ptr_1 == str_property_ptr_2);
     }
   }
