@@ -31,6 +31,11 @@
 #include "types/CloudLocation.h"
 #include "types/CloudColor.h"
 #include "types/CloudWrapperBase.h"
+#include "types/CloudWrapperBool.h"
+#include "types/CloudWrapperFloat.h"
+#include "types/CloudWrapperInt.h"
+#include "types/CloudWrapperString.h"
+
 
 /******************************************************************************
    CONSTANTS
@@ -44,6 +49,12 @@ static long const SECONDS   = 1;
 static long const MINUTES   = 60;
 static long const HOURS     = 3600;
 static long const DAYS      = 86400;
+
+typedef enum {
+  READ      = 0x01,
+  WRITE     = 0x02,
+  READWRITE = READ | WRITE
+} permissionType;
 
 /******************************************************************************
    SYNCHRONIZATION CALLBACKS
@@ -67,6 +78,43 @@ class ArduinoCloudThing {
 
     void begin();
 
+#define addProperty( v, ...) getThing().addPropertyReal(v, #v, __VA_ARGS__)
+
+    static unsigned long const DEFAULT_MIN_TIME_BETWEEN_UPDATES_MILLIS = 500; /* Data rate throttled to 2 Hz */
+
+    void addPropertyReal(ArduinoCloudProperty& property, String name, permissionType permission_type = READWRITE, long seconds = ON_CHANGE, void(*fn)(void) = NULL, float minDelta = 0.0f, void(*synFn)(ArduinoCloudProperty& property) = CLOUD_WINS) {
+      Permission permission = Permission::ReadWrite;
+      if (permission_type == READ) {
+        permission = Permission::Read;
+      } else if (permission_type == WRITE) {
+        permission = Permission::Write;
+      } else {
+        permission = Permission::ReadWrite;
+      }
+
+      if (seconds == ON_CHANGE) {
+        addPropertyReal(property, name, permission).publishOnChange(minDelta, DEFAULT_MIN_TIME_BETWEEN_UPDATES_MILLIS).onUpdate(fn).onSync(synFn);
+      } else {
+        addPropertyReal(property, name, permission).publishEvery(seconds).onUpdate(fn).onSync(synFn);
+      }
+    }
+    void addPropertyReal(bool& property, String name, permissionType permission_type = READWRITE, long seconds = ON_CHANGE, void(*fn)(void) = NULL, float minDelta = 0.0f, void(*synFn)(ArduinoCloudProperty & property) = CLOUD_WINS) {
+      ArduinoCloudProperty *p = new CloudWrapperBool(property);
+      addPropertyReal(*p, name, permission_type, seconds, fn, minDelta, synFn);
+    }
+    void addPropertyReal(float& property, String name, permissionType permission_type = READWRITE, long seconds = ON_CHANGE, void(*fn)(void) = NULL, float minDelta = 0.0f, void(*synFn)(ArduinoCloudProperty & property) = CLOUD_WINS) {
+      ArduinoCloudProperty *p = new CloudWrapperFloat(property);
+      addPropertyReal(*p, name, permission_type, seconds, fn, minDelta, synFn);
+    }
+    void addPropertyReal(int& property, String name, permissionType permission_type = READWRITE, long seconds = ON_CHANGE, void(*fn)(void) = NULL, float minDelta = 0.0, void(*synFn)(ArduinoCloudProperty & property) = CLOUD_WINS) {
+      ArduinoCloudProperty *p = new CloudWrapperInt(property);
+      addPropertyReal(*p, name, permission_type, seconds, fn, minDelta, synFn);
+    }
+    void addPropertyReal(String& property, String name, permissionType permission_type = READWRITE, long seconds = ON_CHANGE, void(*fn)(void) = NULL, float minDelta = 0.0f, void(*synFn)(ArduinoCloudProperty & property) = CLOUD_WINS) {
+      ArduinoCloudProperty *p = new CloudWrapperString(property);
+      addPropertyReal(*p, name, permission_type, seconds, fn, minDelta, synFn);
+    }
+
     ArduinoCloudProperty   & addPropertyReal(ArduinoCloudProperty   & property, String const & name, Permission const permission);
 
     /* encode return > 0 if a property has changed and encodes the changed properties in CBOR format into the provided buffer */
@@ -76,7 +124,7 @@ class ArduinoCloudThing {
 
     bool isPropertyInContainer(String const & name);
     int appendChangedProperties(CborEncoder * arrayEncoder);
-    inline void addProperty(ArduinoCloudProperty   * property_obj) {
+    inline void addThingProperty(ArduinoCloudProperty   * property_obj) {
       _property_list.add(property_obj);
     }
     ArduinoCloudProperty * getProperty(String const & name);
