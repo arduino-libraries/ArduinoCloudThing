@@ -92,7 +92,7 @@ ArduinoCloudProperty& ArduinoCloudThing::addPropertyReal(ArduinoCloudProperty & 
     if (property.isPrimitive()) {
       _numPrimitivesProperties++;
     }
-    addProperty(&property);
+    addThingProperty(&property);
     return (property);
   }
 }
