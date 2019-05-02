@@ -125,8 +125,8 @@ SCENARIO("Arduino Cloud Properties are decoded", "[ArduinoCloudThing::decode]") 
       thing.decode(payload, sizeof(payload) / sizeof(uint8_t));
       Location location_compare = Location(2, 3);
       Location value_location_test = location_test.getValue();
-      bool verify = (value_location_test == location_compare);
-      REQUIRE(verify);
+      REQUIRE(value_location_test.lat == location_compare.lat);
+      REQUIRE(value_location_test.lon == location_compare.lon);
     }
   }
 
@@ -148,17 +148,10 @@ SCENARIO("Arduino Cloud Properties are decoded", "[ArduinoCloudThing::decode]") 
       Color color_compare = Color(2.0, 2.0, 2.0);
       Color value_color_test = color_test.getValue();
       bool verify = (value_color_test == color_compare);
-
-      CloudColor Color_RGB = CloudColor(0.0, 0.0, 0.0);
-      Color c = Color_RGB.getValue();
-      c.setColorRGB(20, 50, 70);
-      Color_RGB = c;
-      uint8_t r, g, b;
-      c.getRGB(r, g, b);
-      bool rgb = 20 == r && 50 == g && 70 == b;
-
-      REQUIRE(rgb);
       REQUIRE(verify);
+      REQUIRE(value_color_test.hue == color_compare.hue);
+      REQUIRE(value_color_test.sat == color_compare.sat);
+      REQUIRE(value_color_test.bri == color_compare.bri);
     }
   }
 
