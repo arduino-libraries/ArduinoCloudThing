@@ -10,6 +10,10 @@
 
 #include <TestUtil.h>
 #include <ArduinoCloudThing.h>
+#include "types/CloudWrapperBool.h"
+#include "types/CloudWrapperFloat.h"
+#include "types/CloudWrapperInt.h"
+#include "types/CloudWrapperString.h"
 
 /**************************************************************************************
    TEST CODE
@@ -23,7 +27,7 @@ SCENARIO("Arduino Cloud Properties are decoded", "[ArduinoCloudThing::decode]") 
       ArduinoCloudThing thing;
       thing.begin();
 
-      bool test = true;
+      CloudBool test = true;
       thing.addPropertyReal(test, "test", Permission::ReadWrite);
 
       /* [{0: "test", 4: false}] = 81 A2 00 64 74 65 73 74 04 F4 */
@@ -42,7 +46,7 @@ SCENARIO("Arduino Cloud Properties are decoded", "[ArduinoCloudThing::decode]") 
       ArduinoCloudThing thing;
       thing.begin();
 
-      int test = 0;
+      CloudInt test = 0;
       thing.addPropertyReal(test, "test", Permission::ReadWrite);
 
       /* [{0: "test", 2: 7}] = 81 A2 00 64 74 65 73 74 02 07 */
@@ -56,7 +60,7 @@ SCENARIO("Arduino Cloud Properties are decoded", "[ArduinoCloudThing::decode]") 
       ArduinoCloudThing thing;
       thing.begin();
 
-      int test = 0;
+      CloudInt test = 0;
       thing.addPropertyReal(test, "test", Permission::ReadWrite);
 
       /* [{0: "test", 2: -7}] = 81 A2 00 64 74 65 73 74 02 26 */
@@ -75,7 +79,7 @@ SCENARIO("Arduino Cloud Properties are decoded", "[ArduinoCloudThing::decode]") 
       ArduinoCloudThing thing;
       thing.begin();
 
-      float test = 0.0f;
+      CloudFloat test = 0.0f;
       thing.addPropertyReal(test, "test", Permission::ReadWrite);
 
       /* [{0: "test", 2: 3.1459}] = 81 A2 00 64 74 65 73 74 02 FB 40 09 2A CD 9E 83 E4 26 */
@@ -94,14 +98,60 @@ SCENARIO("Arduino Cloud Properties are decoded", "[ArduinoCloudThing::decode]") 
       ArduinoCloudThing thing;
       thing.begin();
 
-      String str = "test";
-      thing.addPropertyReal(str, "test", Permission::ReadWrite);
+      CloudString str_test;
+      str_test = "test";
+      thing.addPropertyReal(str_test, "test", Permission::ReadWrite);
 
       /* [{0: "test", 3: "testtt"}] = 81 A2 00 64 74 65 73 74 03 66 74 65 73 74 74 74 */
       uint8_t const payload[] = {0x81, 0xA2, 0x00, 0x64, 0x74, 0x65, 0x73, 0x74, 0x03, 0x66, 0x74, 0x65, 0x73, 0x74, 0x74, 0x74};
       thing.decode(payload, sizeof(payload) / sizeof(uint8_t));
 
-      REQUIRE(str == "testtt");
+      REQUIRE(str_test == "testtt");
+    }
+  }
+
+  /************************************************************************************/
+
+  WHEN("A Location property is changed via CBOR message") {
+    GIVEN("CloudProtocol::V2") {
+      ArduinoCloudThing thing;
+      thing.begin();
+
+      CloudLocation location_test = CloudLocation(0, 1);
+      thing.addPropertyReal(location_test, "test", Permission::ReadWrite);
+
+      /* [{0: "test:lat", 3: 2},{0: "test:lon", 3: 3}] = 82 A2 00 68 74 65 73 74 3A 6C 61 74 02 02 A2 00 68 74 65 73 74 3A 6C 6F 6E 02 03*/
+      uint8_t const payload[] = { 0x82, 0xA2, 0x00, 0x68, 0x74, 0x65, 0x73, 0x74, 0x3A, 0x6C, 0x61, 0x74, 0x02, 0x02, 0xA2, 0x00, 0x68, 0x74, 0x65, 0x73, 0x74, 0x3A, 0x6C, 0x6F, 0x6E, 0x02, 0x03 };
+      thing.decode(payload, sizeof(payload) / sizeof(uint8_t));
+      Location location_compare = Location(2, 3);
+      Location value_location_test = location_test.getValue();
+      REQUIRE(value_location_test.lat == location_compare.lat);
+      REQUIRE(value_location_test.lon == location_compare.lon);
+    }
+  }
+
+  /************************************************************************************/
+
+  WHEN("A Color property is changed via CBOR message") {
+    GIVEN("CloudProtocol::V2") {
+      ArduinoCloudThing thing;
+      thing.begin();
+
+      CloudColor color_test = CloudColor(0.0, 0.0, 0.0);
+
+      thing.addPropertyReal(color_test, "test", Permission::ReadWrite);
+
+      /* [{0: "test:hue", 2: 2.0},{0: "test:sat", 2: 2.0},{0: "test:bri", 2: 2.0}] = 83 A2 00 68 74 65 73 74 3A 68 75 65 02 FA 40 00 00 00 A2 00 68 74 65 73 74 3A 73 61 74 02 FA 40 00 00 00 A2 00 68 74 65 73 74 3A 62 72 69 02 FA 40 00 00 00 */
+      uint8_t const payload[] = {0x83, 0xA2, 0x00, 0x68, 0x74, 0x65, 0x73, 0x74, 0x3A, 0x68, 0x75, 0x65, 0x02, 0xFA, 0x40, 0x00, 0x00, 0x00, 0xA2, 0x00, 0x68, 0x74, 0x65, 0x73, 0x74, 0x3A, 0x73, 0x61, 0x74, 0x02, 0xFA, 0x40, 0x00, 0x00, 0x00, 0xA2, 0x00, 0x68, 0x74, 0x65, 0x73, 0x74, 0x3A, 0x62, 0x72, 0x69, 0x02, 0xFA, 0x40, 0x00, 0x00, 0x00 };
+      thing.decode(payload, sizeof(payload) / sizeof(uint8_t));
+
+      Color color_compare = Color(2.0, 2.0, 2.0);
+      Color value_color_test = color_test.getValue();
+      bool verify = (value_color_test == color_compare);
+      REQUIRE(verify);
+      REQUIRE(value_color_test.hue == color_compare.hue);
+      REQUIRE(value_color_test.sat == color_compare.sat);
+      REQUIRE(value_color_test.bri == color_compare.bri);
     }
   }
 
@@ -113,10 +163,11 @@ SCENARIO("Arduino Cloud Properties are decoded", "[ArduinoCloudThing::decode]") 
         ArduinoCloudThing thing;
         thing.begin();
 
-        bool   bool_test = false;
-        int    int_test = 1;
-        float  float_test = 2.0f;
-        String str_test("str_test");
+        CloudBool   bool_test = false;
+        CloudInt    int_test = 1;
+        CloudFloat  float_test = 2.0f;
+        CloudString str_test;
+        str_test = ("str_test");
 
         thing.addPropertyReal(bool_test,  "bool_test",  Permission::ReadWrite);
         thing.addPropertyReal(int_test,   "int_test",   Permission::ReadWrite);
@@ -141,10 +192,11 @@ SCENARIO("Arduino Cloud Properties are decoded", "[ArduinoCloudThing::decode]") 
         ArduinoCloudThing thing;
         thing.begin();
 
-        bool   bool_test = false;
-        int    int_test = 1;
-        float  float_test = 2.0f;
-        String str_test("str_test");
+        CloudBool   bool_test = false;
+        CloudInt    int_test = 1;
+        CloudFloat  float_test = 2.0f;
+        CloudString str_test;
+        str_test = ("str_test");
 
         thing.addPropertyReal(bool_test,  "bool_test",  Permission::ReadWrite).onSync(CLOUD_WINS);
         thing.addPropertyReal(int_test,   "int_test",   Permission::ReadWrite).onSync(CLOUD_WINS);
@@ -165,14 +217,50 @@ SCENARIO("Arduino Cloud Properties are decoded", "[ArduinoCloudThing::decode]") 
 
       /********************************************************************************/
 
+      WHEN("Multiple primitive properties of different type are synchronized via CBOR message. FORCE_CLOUD_SYNC is passed as synchronization function and as a consequence values contained in the incoming message are stored in the properties") {
+        ArduinoCloudThing thing;
+        thing.begin();
+
+        int    int_test = 1;
+        bool   bool_test = false;
+        float  float_test = 2.0f;
+        String str_test;
+        str_test = "str_test";
+
+        ArduinoCloudProperty *i = new CloudWrapperInt(int_test);
+        ArduinoCloudProperty *b = new CloudWrapperBool(bool_test);
+        ArduinoCloudProperty *f = new CloudWrapperFloat(float_test);
+        ArduinoCloudProperty *s = new CloudWrapperString(str_test);
+
+        thing.addPropertyReal(*b,  "bool_test",  Permission::ReadWrite).onSync(CLOUD_WINS);
+        thing.addPropertyReal(*i,   "int_test",   Permission::ReadWrite).onSync(CLOUD_WINS);
+        thing.addPropertyReal(*f, "float_test", Permission::ReadWrite).onSync(CLOUD_WINS);
+        thing.addPropertyReal(*s,   "str_test",   Permission::ReadWrite).onSync(CLOUD_WINS);
+
+        thing.updateTimestampOnLocallyChangedProperties();
+
+        /* [{0: "bool_test", 4: true}, {0: "int_test", 2: 10}, {0: "float_test", 2: 20.0}, {0: "str_test", 3: "hello arduino"}]
+           = 84 A2 00 69 62 6F 6F 6C 5F 74 65 73 74 04 F5 A2 00 68 69 6E 74 5F 74 65 73 74 02 0A A2 00 6A 66 6C 6F 61 74 5F 74 65 73 74 02 F9 4D 00 A2 00 68 73 74 72 5F 74 65 73 74 03 6D 68 65 6C 6C 6F 20 61 72 64 75 69 6E 6F
+        */
+        uint8_t const payload[] = {0x84, 0xA2, 0x00, 0x69, 0x62, 0x6F, 0x6F, 0x6C, 0x5F, 0x74, 0x65, 0x73, 0x74, 0x04, 0xF5, 0xA2, 0x00, 0x68, 0x69, 0x6E, 0x74, 0x5F, 0x74, 0x65, 0x73, 0x74, 0x02, 0x0A, 0xA2, 0x00, 0x6A, 0x66, 0x6C, 0x6F, 0x61, 0x74, 0x5F, 0x74, 0x65, 0x73, 0x74, 0x02, 0xF9, 0x4D, 0x00, 0xA2, 0x00, 0x68, 0x73, 0x74, 0x72, 0x5F, 0x74, 0x65, 0x73, 0x74, 0x03, 0x6D, 0x68, 0x65, 0x6C, 0x6C, 0x6F, 0x20, 0x61, 0x72, 0x64, 0x75, 0x69, 0x6E, 0x6F};
+        thing.decode(payload, sizeof(payload) / sizeof(uint8_t), true);
+
+        REQUIRE(bool_test  == true);
+        REQUIRE(int_test   == 10);
+        REQUIRE(float_test == Approx(20.0).epsilon(0.01));
+        REQUIRE(str_test   == "hello arduino");
+      }
+
+      /********************************************************************************/
+
       WHEN("Multiple String properties are changed via CBOR message") {
         ArduinoCloudThing thing;
         thing.begin();
 
-        String str_1("hello"),
-               str_2("arduino"),
-               str_3("cloud"),
-               str_4("test");
+        CloudString str_1("hello"),
+                    str_2("arduino"),
+                    str_3("cloud"),
+                    str_4("test");
 
         thing.addPropertyReal(str_1, "str_1", Permission::ReadWrite);
         thing.addPropertyReal(str_2, "str_2", Permission::ReadWrite);
@@ -200,7 +288,7 @@ SCENARIO("Arduino Cloud Properties are decoded", "[ArduinoCloudThing::decode]") 
       ArduinoCloudThing thing;
       thing.begin();
 
-      String str = "hello";
+      CloudString str = "hello";
       thing.addPropertyReal(str, "test", Permission::ReadWrite);
 
       /* [{-2: "some-test-base-name", 0: "test", 3: "test"}] = 81 A3 21 73 73 6F 6D 65 2D 74 65 73 74 2D 62 61 73 65 2D 6E 61 6D 65 00 64 74 65 73 74 03 64 74 65 73 74 */
@@ -218,7 +306,7 @@ SCENARIO("Arduino Cloud Properties are decoded", "[ArduinoCloudThing::decode]") 
       ArduinoCloudThing thing;
       thing.begin();
 
-      int test = 0;
+      CloudInt test = 0;
       thing.addPropertyReal(test, "test", Permission::ReadWrite);
 
       /* [{-3: 123.456, 0: "test", 2: 1}] = 81 A3 22 FB 40 5E DD 2F 1A 9F BE 77 00 64 74 65 73 74 02 01 */
@@ -236,7 +324,7 @@ SCENARIO("Arduino Cloud Properties are decoded", "[ArduinoCloudThing::decode]") 
       ArduinoCloudThing thing;
       thing.begin();
 
-      int test = 0;
+      CloudInt test = 0;
       thing.addPropertyReal(test, "test", Permission::ReadWrite);
 
       /* [{6: 123.456, 0: "test", 2: 1}] = 81 A3 06 FB 40 5E DD 2F 1A 9F BE 77 00 64 74 65 73 74 02 01 */
@@ -254,7 +342,7 @@ SCENARIO("Arduino Cloud Properties are decoded", "[ArduinoCloudThing::decode]") 
       ArduinoCloudThing thing;
       thing.begin();
 
-      int test = 0;
+      CloudInt test = 0;
       thing.addPropertyReal(test, "test", Permission::ReadWrite);
 
       /* [{-1: 1, 0: "test", 2: 1}] = 81 A3 20 01 00 64 74 65 73 74 02 01 */
@@ -272,7 +360,7 @@ SCENARIO("Arduino Cloud Properties are decoded", "[ArduinoCloudThing::decode]") 
       ArduinoCloudThing thing;
       thing.begin();
 
-      int test = 0;
+      CloudInt test = 0;
       thing.addPropertyReal(test, "test", Permission::ReadWrite);
 
       /* [{-2: "base-name", -3: 654.321, 6: 123.456, 0: "test", 2: 1}] =
@@ -292,7 +380,7 @@ SCENARIO("Arduino Cloud Properties are decoded", "[ArduinoCloudThing::decode]") 
       ArduinoCloudThing thing;
       thing.begin();
 
-      int test = 0;
+      CloudInt test = 0;
       thing.addPropertyReal(test, "test", Permission::ReadWrite);
 
       /* [{123: 123, 0: "test", 2: 1}] = 81 A3 18 7B 18 7B 00 64 74 65 73 74 02 01 */

@@ -7,28 +7,33 @@
 #######################################
 
 ArduinoCloudThing	KEYWORD1
+CloudBool	KEYWORD1
+CloudInt	KEYWORD1
+CloudFloat	KEYWORD1
+CloudString	KEYWORD1
+
 
 #######################################
 # Methods and Functions (KEYWORD2)
 #######################################
 
-begin KEYWORD2
-encode KEYWORD2
-decode KEYWORD2
-addPropertyReal KEYWORD2
-updateTimestampOnChangedProperties KEYWORD2
+begin	KEYWORD2
+encode	KEYWORD2
+decode	KEYWORD2
+addPropertyReal	KEYWORD2
+updateTimestampOnChangedProperties	KEYWORD2
 
 #######################################
 # Constants (LITERAL1)
 #######################################
 
-ON LITERAL1
-OFF LITERAL1
-ON_CHANGE LITERAL1
-SECONDS LITERAL1
-MINUTES LITERAL1
-HOURS LITERAL1
-DAYS LITERAL1
-AUTO_SYNC LITERAL1
-FORCE_DEVICE_SYNC LITERAL1
-FORCE_CLOUD_SYNC LITERAL1
+ON	LITERAL1
+OFF	LITERAL1
+ON_CHANGE	LITERAL1
+SECONDS	LITERAL1
+MINUTES	LITERAL1
+HOURS	LITERAL1
+DAYS	LITERAL1
+MOST_RECENT_WINS	LITERAL1
+DEVICE_WINS	LITERAL1
+CLOUD_WINS	LITERAL1

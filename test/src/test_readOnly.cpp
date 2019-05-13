@@ -22,7 +22,7 @@ SCENARIO("A Arduino cloud property is marked 'read only'", "[ArduinoCloudThing::
     ArduinoCloudThing thing;
     thing.begin();
 
-    int test = 0;
+    CloudInt test = 0;
     thing.addPropertyReal(test, "test", Permission::Read);
 
     /* [{0: "test", 2: 7}] = 81 A2 00 64 74 65 73 74 02 07 */

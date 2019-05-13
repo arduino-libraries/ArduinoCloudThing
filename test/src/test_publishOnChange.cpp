@@ -22,7 +22,7 @@ SCENARIO("A Arduino cloud property is published on value change", "[ArduinoCloud
     ArduinoCloudThing thing;
     thing.begin();
 
-    int       test  = 10;
+    CloudInt       test  = 10;
     int const DELTA = 6;
 
     thing.addPropertyReal(test, "test", Permission::ReadWrite).publishOnChange(DELTA);
