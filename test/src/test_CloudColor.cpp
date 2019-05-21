@@ -32,7 +32,6 @@ SCENARIO("Arduino Cloud Properties ", "[ArduinoCloudThing::CloudColor]") {
   WHEN("Set and Get different RGB colors") {
     GIVEN("CloudProtocol::V2") {
 
-      bool verify;
       uint8_t r, g, b;
 
       CloudColor color_test = CloudColor(0.0, 0.0, 0.0);
