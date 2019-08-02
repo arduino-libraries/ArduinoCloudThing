@@ -24,6 +24,8 @@ set(TEST_SRCS
   src/main.cpp
   src/test_addPropertyReal.cpp
   src/test_callback.cpp
+  src/test_CloudColor.cpp
+  src/test_CloudLocation.cpp
   src/test_decode.cpp
   src/test_encode.cpp
   src/test_publishEvery.cpp
@@ -32,7 +34,6 @@ set(TEST_SRCS
   src/test_readOnly.cpp
   src/test_writeOnly.cpp
   src/TestUtil.cpp
-  src/test_CloudColor.cpp
 
   ../src/ArduinoCloudThing.cpp
   ../src/ArduinoCloudProperty.cpp
