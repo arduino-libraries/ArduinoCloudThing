@@ -49,7 +49,7 @@ class DimmeredLight {
 class CloudDimmeredLight : public ArduinoCloudProperty {
   private:
     DimmeredLight _value,
-          _cloud_value;
+                  _cloud_value;
 
   public:
     CloudDimmeredLight() : _value(false, 0), _cloud_value(false, 0) {}
