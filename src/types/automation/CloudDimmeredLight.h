@@ -74,7 +74,7 @@ class CloudDimmeredLight : public ArduinoCloudProperty {
     DimmeredLight getValue() {
       return _value;
     }
-    
+
     virtual void fromCloudToLocal() {
       _value = _cloud_value;
     }
