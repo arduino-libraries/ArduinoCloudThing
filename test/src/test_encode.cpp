@@ -86,7 +86,7 @@ SCENARIO("Arduino Cloud Properties are encoded", "[ArduinoCloudThing::encode]") 
       string_test = "test";
       thing.addPropertyReal(string_test, "test", Permission::ReadWrite);
 
-      /* [{0: "test", 3: "test"}] = 9F A2 00 64 74 65 73 74 03 64 74 65 73 74FF*/
+      /* [{0: "test", 3: "test"}] = 9F A2 00 64 74 65 73 74 03 64 74 65 73 74 FF*/
       std::vector<uint8_t> const expected = {0x9F, 0xA2, 0x00, 0x64, 0x74, 0x65, 0x73, 0x74, 0x03, 0x64, 0x74, 0x65, 0x73, 0x74, 0xFF};
       std::vector<uint8_t> const actual = encode(thing);
       REQUIRE(actual == expected);
@@ -122,8 +122,158 @@ SCENARIO("Arduino Cloud Properties are encoded", "[ArduinoCloudThing::encode]") 
       CloudColor color_test = CloudColor(2.0, 2.0, 2.0);
       thing.addPropertyReal(color_test, "test", Permission::ReadWrite);
 
-      /* [{0: "test:hue", 2: 2.0},{0: "test:sat", 2: 2.0},{0: "test:bri", 2: 2.0}] = 83 A2 00 68 74 65 73 74 3A 68 75 65 02 FA 40 00 00 00 A2 00 68 74 65 73 74 3A 73 61 74 02 FA 40 00 00 00 A2 00 68 74 65 73 74 3A 62 72 69 02 FA 40 00 00 00 */
+      /* [{0: "test:hue", 2: 2.0},{0: "test:sat", 2: 2.0},{0: "test:bri", 2: 2.0}] = 9F A2 00 68 74 65 73 74 3A 68 75 65 02 FA 40 00 00 00 A2 00 68 74 65 73 74 3A 73 61 74 02 FA 40 00 00 00 A2 00 68 74 65 73 74 3A 62 72 69 02 FA 40 00 00 00 FF*/
       std::vector<uint8_t> const expected = {0x9F, 0xA2, 0x00, 0x68, 0x74, 0x65, 0x73, 0x74, 0x3A, 0x68, 0x75, 0x65, 0x02, 0xFA, 0x40, 0x00, 0x00, 0x00, 0xA2, 0x00, 0x68, 0x74, 0x65, 0x73, 0x74, 0x3A, 0x73, 0x61, 0x74, 0x02, 0xFA, 0x40, 0x00, 0x00, 0x00, 0xA2, 0x00, 0x68, 0x74, 0x65, 0x73, 0x74, 0x3A, 0x62, 0x72, 0x69, 0x02, 0xFA, 0x40, 0x00, 0x00, 0x00, 0xFF };
+      std::vector<uint8_t> const actual = encode(thing);
+      REQUIRE(actual == expected);
+    }
+  }
+
+  /************************************************************************************/
+
+  WHEN("A 'ColoredLight' property is added") {
+    GIVEN("CloudProtocol::V2") {
+      ArduinoCloudThing thing;
+      thing.begin();
+      encode(thing);
+
+      CloudColoredLight color_test = CloudColoredLight(true, 2.0, 2.0, 2.0);
+      thing.addPropertyReal(color_test, "test", Permission::ReadWrite);
+
+      /* [{0: "test:swi", 4: true},{0: "test:hue", 2: 2.0},{0: "test:sat", 2: 2.0},{0: "test:bri", 2: 2.0}] = 83 A2 00 68 74 65 73 74 3A 73 77 69 04 F5 //A2 00 68 74 65 73 74 3A 68 75 65 02 FA 40 00 00 00 A2 00 68 74 65 73 74 3A 73 61 74 02 FA 40 00 00 00 A2 00 68 74 65 73 74 3A 62 72 69 02 FA 40 00 00 00 FF*/
+      std::vector<uint8_t> const expected = {0x9F, 0xA2, 0x00, 0x68, 0x74, 0x65, 0x73, 0x74, 0x3A, 0x73, 0x77, 0x69, 0x04, 0xF5, 0xA2, 0x00, 0x68, 0x74, 0x65, 0x73, 0x74, 0x3A, 0x68, 0x75, 0x65, 0x02, 0xFA, 0x40, 0x00, 0x00, 0x00, 0xA2, 0x00, 0x68, 0x74, 0x65, 0x73, 0x74, 0x3A, 0x73, 0x61, 0x74, 0x02, 0xFA, 0x40, 0x00, 0x00, 0x00, 0xA2, 0x00, 0x68, 0x74, 0x65, 0x73, 0x74, 0x3A, 0x62, 0x72, 0x69, 0x02, 0xFA, 0x40, 0x00, 0x00, 0x00, 0xFF };
+      std::vector<uint8_t> const actual = encode(thing);
+      REQUIRE(actual == expected);
+    }
+  }
+
+  /************************************************************************************/
+
+  WHEN("A 'DimmeredLight' property is added") {
+    GIVEN("CloudProtocol::V2") {
+      ArduinoCloudThing thing;
+      thing.begin();
+      encode(thing);
+
+      CloudDimmeredLight color_test = CloudDimmeredLight(true, 2.0);
+      thing.addPropertyReal(color_test, "test", Permission::ReadWrite);
+
+      /* [{0: "test:swi", 4: true},{0: "test:hue", 2: 0.0},{0: "test:sat", 2: 0.0},{0: "test:bri", 2: 2.0}] = 83 A2 00 68 74 65 73 74 3A 73 77 69 04 F5 //A2 00 68 74 65 73 74 3A 68 75 65 02 FA 00 00 00 00 A2 00 68 74 65 73 74 3A 73 61 74 02 FA 00 00 00 00 A2 00 68 74 65 73 74 3A 62 72 69 02 FA 40 00 00 00 FF*/
+      std::vector<uint8_t> const expected = {0x9F, 0xA2, 0x00, 0x68, 0x74, 0x65, 0x73, 0x74, 0x3A, 0x73, 0x77, 0x69, 0x04, 0xF5, 0xA2, 0x00, 0x68, 0x74, 0x65, 0x73, 0x74, 0x3A, 0x68, 0x75, 0x65, 0x02, 0xFA, 0x00, 0x00, 0x00, 0x00, 0xA2, 0x00, 0x68, 0x74, 0x65, 0x73, 0x74, 0x3A, 0x73, 0x61, 0x74, 0x02, 0xFA, 0x00, 0x00, 0x00, 0x00, 0xA2, 0x00, 0x68, 0x74, 0x65, 0x73, 0x74, 0x3A, 0x62, 0x72, 0x69, 0x02, 0xFA, 0x40, 0x00, 0x00, 0x00, 0xFF };
+      std::vector<uint8_t> const actual = encode(thing);
+      REQUIRE(actual == expected);
+    }
+  }
+
+  /************************************************************************************/
+
+  WHEN("A light property is added") {
+    GIVEN("CloudProtocol::V2") {
+      ArduinoCloudThing thing;
+      thing.begin();
+      encode(thing);
+
+      CloudLight test;
+      test = true;
+      thing.addPropertyReal(test, "test", Permission::ReadWrite);
+
+      /* [{0: "test", 4: true}] = 9F A2 00 64 74 65 73 74 04 F5 FF*/
+      std::vector<uint8_t> const expected = {0x9F, 0xA2, 0x00, 0x64, 0x74, 0x65, 0x73, 0x74, 0x04, 0xF5, 0xFF};
+      std::vector<uint8_t> const actual = encode(thing);
+      REQUIRE(actual == expected);
+    }
+  }
+
+  /************************************************************************************/
+
+  WHEN("A contact sensor property is added") {
+    GIVEN("CloudProtocol::V2") {
+      ArduinoCloudThing thing;
+      thing.begin();
+      encode(thing);
+
+      CloudContactSensor test;
+      test = true;
+      thing.addPropertyReal(test, "test", Permission::ReadWrite);
+
+      /* [{0: "test", 4: true}] = 9F A2 00 64 74 65 73 74 04 F5 FF*/
+      std::vector<uint8_t> const expected = {0x9F, 0xA2, 0x00, 0x64, 0x74, 0x65, 0x73, 0x74, 0x04, 0xF5, 0xFF};
+      std::vector<uint8_t> const actual = encode(thing);
+      REQUIRE(actual == expected);
+    }
+  }
+
+  /************************************************************************************/
+
+  WHEN("A motion sensor property is added") {
+    GIVEN("CloudProtocol::V2") {
+      ArduinoCloudThing thing;
+      thing.begin();
+      encode(thing);
+
+      CloudMotionSensor test;
+      test = true;
+      thing.addPropertyReal(test, "test", Permission::ReadWrite);
+
+      /* [{0: "test", 4: true}] = 9F A2 00 64 74 65 73 74 04 F5 FF*/
+      std::vector<uint8_t> const expected = {0x9F, 0xA2, 0x00, 0x64, 0x74, 0x65, 0x73, 0x74, 0x04, 0xF5, 0xFF};
+      std::vector<uint8_t> const actual = encode(thing);
+      REQUIRE(actual == expected);
+    }
+  }
+
+  /************************************************************************************/
+
+  WHEN("A smart plug property is added") {
+    GIVEN("CloudProtocol::V2") {
+      ArduinoCloudThing thing;
+      thing.begin();
+      encode(thing);
+
+      CloudSmartPlug test;
+      test = true;
+      thing.addPropertyReal(test, "test", Permission::ReadWrite);
+
+      /* [{0: "test", 4: true}] = 9F A2 00 64 74 65 73 74 04 F5 FF*/
+      std::vector<uint8_t> const expected = {0x9F, 0xA2, 0x00, 0x64, 0x74, 0x65, 0x73, 0x74, 0x04, 0xF5, 0xFF};
+      std::vector<uint8_t> const actual = encode(thing);
+      REQUIRE(actual == expected);
+    }
+  }
+
+  /************************************************************************************/
+
+  WHEN("A Temperature property is added") {
+    GIVEN("CloudProtocol::V2") {
+      ArduinoCloudThing thing;
+      thing.begin();
+      encode(thing);
+
+      CloudTemperature float_test;
+      float_test = 3.14159;
+      thing.addPropertyReal(float_test, "test", Permission::ReadWrite);
+
+      /* [{0: "test", 2: 3.141590118408203}] = 9F A2 00 64 74 65 73 74 02 FA 40 49 0F D0 FF */
+      std::vector<uint8_t> const expected = {0x9F, 0xA2, 0x00, 0x64, 0x74, 0x65, 0x73, 0x74, 0x02, 0xFA, 0x40, 0x49, 0x0F, 0xD0, 0xFF};
+      std::vector<uint8_t> const actual = encode(thing);
+      REQUIRE(actual == expected);
+    }
+  }
+
+  /************************************************************************************/
+
+  WHEN("A switch property is added") {
+    GIVEN("CloudProtocol::V2") {
+      ArduinoCloudThing thing;
+      thing.begin();
+      encode(thing);
+
+      CloudSwitch test;
+      test = true;
+      thing.addPropertyReal(test, "test", Permission::ReadWrite);
+
+      /* [{0: "test", 4: true}] = 9F A2 00 64 74 65 73 74 04 F5 FF*/
+      std::vector<uint8_t> const expected = {0x9F, 0xA2, 0x00, 0x64, 0x74, 0x65, 0x73, 0x74, 0x04, 0xF5, 0xFF};
       std::vector<uint8_t> const actual = encode(thing);
       REQUIRE(actual == expected);
     }
