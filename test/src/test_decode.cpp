@@ -14,6 +14,14 @@
 #include "types/CloudWrapperFloat.h"
 #include "types/CloudWrapperInt.h"
 #include "types/CloudWrapperString.h"
+#include "types/automation/CloudColoredLight.h"
+#include "types/automation/CloudContactSensor.h"
+#include "types/automation/CloudDimmeredLight.h"
+#include "types/automation/CloudLight.h"
+#include "types/automation/CloudMotionSensor.h"
+#include "types/automation/CloudSmartPlug.h"
+#include "types/automation/CloudSwitch.h"
+#include "types/automation/CloudTemperature.h"
 
 /**************************************************************************************
    TEST CODE
@@ -152,6 +160,176 @@ SCENARIO("Arduino Cloud Properties are decoded", "[ArduinoCloudThing::decode]") 
       REQUIRE(value_color_test.hue == color_compare.hue);
       REQUIRE(value_color_test.sat == color_compare.sat);
       REQUIRE(value_color_test.bri == color_compare.bri);
+    }
+  }
+
+  /************************************************************************************/
+
+  WHEN("A ColoredLight property is changed via CBOR message") {
+    GIVEN("CloudProtocol::V2") {
+      ArduinoCloudThing thing;
+      thing.begin();
+
+      CloudColoredLight color_test = CloudColoredLight(false, 0.0, 0.0, 0.0);
+
+      thing.addPropertyReal(color_test, "test", Permission::ReadWrite);
+
+      /* [{0: "test:swi", 4: true},{0: "test:hue", 2: 2.0},{0: "test:sat", 2: 2.0},{0: "test:bri", 2: 2.0}] = 83 A2 00 68 74 65 73 74 3A 73 77 69 04 F5 //A2 00 68 74 65 73 74 3A 68 75 65 02 FA 40 00 00 00 A2 00 68 74 65 73 74 3A 73 61 74 02 FA 40 00 00 00 A2 00 68 74 65 73 74 3A 62 72 69 02 FA 40 00 00 00 */
+      uint8_t const payload[] = {0x84, 0xA2, 0x00, 0x68, 0x74, 0x65, 0x73, 0x74, 0x3A, 0x73, 0x77, 0x69, 0x04, 0xF5, 0xA2, 0x00, 0x68, 0x74, 0x65, 0x73, 0x74, 0x3A, 0x68, 0x75, 0x65, 0x02, 0xFA, 0x40, 0x00, 0x00, 0x00, 0xA2, 0x00, 0x68, 0x74, 0x65, 0x73, 0x74, 0x3A, 0x73, 0x61, 0x74, 0x02, 0xFA, 0x40, 0x00, 0x00, 0x00, 0xA2, 0x00, 0x68, 0x74, 0x65, 0x73, 0x74, 0x3A, 0x62, 0x72, 0x69, 0x02, 0xFA, 0x40, 0x00, 0x00, 0x00 };
+      thing.decode(payload, sizeof(payload) / sizeof(uint8_t));
+
+      ColoredLight color_compare = ColoredLight(true, 2.0, 2.0, 2.0);
+      ColoredLight value_color_test = color_test.getValue();
+      bool verify = (value_color_test == color_compare);
+      REQUIRE(verify);
+      REQUIRE(value_color_test.swi == color_compare.swi);
+      REQUIRE(value_color_test.hue == color_compare.hue);
+      REQUIRE(value_color_test.sat == color_compare.sat);
+      REQUIRE(value_color_test.bri == color_compare.bri);
+    }
+  }
+
+  /************************************************************************************/
+
+  WHEN("A DimmeredLight property is changed via CBOR message") {
+    GIVEN("CloudProtocol::V2") {
+      ArduinoCloudThing thing;
+      thing.begin();
+
+      CloudDimmeredLight light_test = CloudDimmeredLight(false, 0.0);
+
+      thing.addPropertyReal(light_test, "test", Permission::ReadWrite);
+
+      /* [{0: "test:swi", 4: true},{0: "test:bri", 2: 2.0}] = 83 A2 00 68 74 65 73 74 3A 73 77 69 04 F5 //A2 00 68 74 65 73 74 3A 62 72 69 02 FA 40 00 00 00  */
+      uint8_t const payload[] = {0x82, 0xA2, 0x00, 0x68, 0x74, 0x65, 0x73, 0x74, 0x3A, 0x73, 0x77, 0x69, 0x04, 0xF5, 0xA2, 0x00, 0x68, 0x74, 0x65, 0x73, 0x74, 0x3A, 0x62, 0x72, 0x69, 0x02, 0xFA, 0x40, 0x00, 0x00, 0x00};
+      thing.decode(payload, sizeof(payload) / sizeof(uint8_t));
+
+      DimmeredLight light_compare = DimmeredLight(true, 2.0);
+      DimmeredLight value_light_test = light_test.getValue();
+      bool verify = (value_light_test == light_compare);
+      REQUIRE(verify);
+      REQUIRE(value_light_test.swi == light_compare.swi);
+      REQUIRE(value_light_test.bri == light_compare.bri);
+    }
+  }
+
+  /************************************************************************************/
+
+  WHEN("A Light property is changed via CBOR message") {
+    GIVEN("CloudProtocol::V2") {
+      ArduinoCloudThing thing;
+      thing.begin();
+
+      CloudLight light_test;
+      light_test = false;
+
+      thing.addPropertyReal(light_test, "test", Permission::ReadWrite);
+
+      /* [{0: "test", 4: true}] = 81 A2 00 64 74 65 73 74 04 F5  */
+      uint8_t const payload[] = {0x81, 0xA2, 0x00, 0x64, 0x74, 0x65, 0x73, 0x74, 0x04, 0xF5};
+      thing.decode(payload, sizeof(payload) / sizeof(uint8_t));
+
+      REQUIRE(light_test == true);
+    }
+  }
+
+  /************************************************************************************/
+
+  WHEN("A ContactSensor property is changed via CBOR message") {
+    GIVEN("CloudProtocol::V2") {
+      ArduinoCloudThing thing;
+      thing.begin();
+
+      CloudContactSensor contact_test;
+      contact_test = false;
+
+      thing.addPropertyReal(contact_test, "test", Permission::ReadWrite);
+
+      /* [{0: "test", 4: true}] = 81 A2 00 64 74 65 73 74 04 F5  */
+      uint8_t const payload[] = {0x81, 0xA2, 0x00, 0x64, 0x74, 0x65, 0x73, 0x74, 0x04, 0xF5};
+      thing.decode(payload, sizeof(payload) / sizeof(uint8_t));
+
+      REQUIRE(contact_test == true);
+    }
+  }
+
+  /************************************************************************************/
+
+  WHEN("A MotionSensor property is changed via CBOR message") {
+    GIVEN("CloudProtocol::V2") {
+      ArduinoCloudThing thing;
+      thing.begin();
+
+      CloudMotionSensor motion_test;
+      motion_test = false;
+
+      thing.addPropertyReal(motion_test, "test", Permission::ReadWrite);
+
+      /* [{0: "test", 4: true}] = 81 A2 00 64 74 65 73 74 04 F5  */
+      uint8_t const payload[] = {0x81, 0xA2, 0x00, 0x64, 0x74, 0x65, 0x73, 0x74, 0x04, 0xF5};
+      thing.decode(payload, sizeof(payload) / sizeof(uint8_t));
+
+      REQUIRE(motion_test == true);
+    }
+  }
+
+  /************************************************************************************/
+
+  WHEN("A SmartPlug property is changed via CBOR message") {
+    GIVEN("CloudProtocol::V2") {
+      ArduinoCloudThing thing;
+      thing.begin();
+
+      CloudSmartPlug plug_test;
+      plug_test = false;
+
+      thing.addPropertyReal(plug_test, "test", Permission::ReadWrite);
+
+      /* [{0: "test", 4: true}] = 81 A2 00 64 74 65 73 74 04 F5  */
+      uint8_t const payload[] = {0x81, 0xA2, 0x00, 0x64, 0x74, 0x65, 0x73, 0x74, 0x04, 0xF5};
+      thing.decode(payload, sizeof(payload) / sizeof(uint8_t));
+
+      REQUIRE(plug_test == true);
+    }
+  }
+
+  /************************************************************************************/
+
+  WHEN("A Switch property is changed via CBOR message") {
+    GIVEN("CloudProtocol::V2") {
+      ArduinoCloudThing thing;
+      thing.begin();
+
+      CloudSwitch switch_test;
+      switch_test = false;
+
+      thing.addPropertyReal(switch_test, "test", Permission::ReadWrite);
+
+      /* [{0: "test", 4: true}] = 81 A2 00 64 74 65 73 74 04 F5  */
+      uint8_t const payload[] = {0x81, 0xA2, 0x00, 0x64, 0x74, 0x65, 0x73, 0x74, 0x04, 0xF5};
+      thing.decode(payload, sizeof(payload) / sizeof(uint8_t));
+
+      REQUIRE(switch_test == true);
+    }
+  }
+
+  /************************************************************************************/
+
+  WHEN("A Temperature property is changed via CBOR message") {
+    GIVEN("CloudProtocol::V2") {
+      ArduinoCloudThing thing;
+      thing.begin();
+
+      CloudTemperature test;
+      test = 0.0f;
+      thing.addPropertyReal(test, "test", Permission::ReadWrite);
+
+      /* [{0: "test", 2: 3.1459}] = 81 A2 00 64 74 65 73 74 02 FB 40 09 2A CD 9E 83 E4 26 */
+      uint8_t const payload[] = {0x81, 0xA2, 0x00, 0x64, 0x74, 0x65, 0x73, 0x74, 0x02, 0xFB, 0x40, 0x09, 0x2A, 0xCD, 0x9E, 0x83, 0xE4, 0x26};
+      int const payload_length = sizeof(payload) / sizeof(uint8_t);
+      thing.decode(payload, payload_length);
+
+      REQUIRE(test == Approx(3.1459).epsilon(0.01));
     }
   }
 
