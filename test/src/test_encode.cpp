@@ -149,13 +149,13 @@ SCENARIO("Arduino Cloud Properties are encoded", "[ArduinoCloudThing::encode]") 
 
   /************************************************************************************/
 
-  WHEN("A 'DimmeredLight' property is added") {
+  WHEN("A 'DimmedLight' property is added") {
     GIVEN("CloudProtocol::V2") {
       ArduinoCloudThing thing;
       thing.begin();
       encode(thing);
 
-      CloudDimmeredLight color_test = CloudDimmeredLight(true, 2.0);
+      CloudDimmedLight color_test = CloudDimmedLight(true, 2.0);
       thing.addPropertyReal(color_test, "test", Permission::ReadWrite);
 
       /* [{0: "test:swi", 4: true},{0: "test:hue", 2: 0.0},{0: "test:sat", 2: 0.0},{0: "test:bri", 2: 2.0}] = 83 A2 00 68 74 65 73 74 3A 73 77 69 04 F5 //A2 00 68 74 65 73 74 3A 68 75 65 02 FA 00 00 00 00 A2 00 68 74 65 73 74 3A 73 61 74 02 FA 00 00 00 00 A2 00 68 74 65 73 74 3A 62 72 69 02 FA 40 00 00 00 FF*/
