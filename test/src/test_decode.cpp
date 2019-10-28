@@ -16,7 +16,7 @@
 #include "types/CloudWrapperString.h"
 #include "types/automation/CloudColoredLight.h"
 #include "types/automation/CloudContactSensor.h"
-#include "types/automation/CloudDimmeredLight.h"
+#include "types/automation/CloudDimmedLight.h"
 #include "types/automation/CloudLight.h"
 #include "types/automation/CloudMotionSensor.h"
 #include "types/automation/CloudSmartPlug.h"
@@ -191,12 +191,12 @@ SCENARIO("Arduino Cloud Properties are decoded", "[ArduinoCloudThing::decode]") 
 
   /************************************************************************************/
 
-  WHEN("A DimmeredLight property is changed via CBOR message") {
+  WHEN("A DimmedLight property is changed via CBOR message") {
     GIVEN("CloudProtocol::V2") {
       ArduinoCloudThing thing;
       thing.begin();
 
-      CloudDimmeredLight light_test = CloudDimmeredLight(false, 0.0);
+      CloudDimmedLight light_test = CloudDimmedLight(false, 0.0);
 
       thing.addPropertyReal(light_test, "test", Permission::ReadWrite);
 
@@ -204,8 +204,8 @@ SCENARIO("Arduino Cloud Properties are decoded", "[ArduinoCloudThing::decode]") 
       uint8_t const payload[] = {0x82, 0xA2, 0x00, 0x68, 0x74, 0x65, 0x73, 0x74, 0x3A, 0x73, 0x77, 0x69, 0x04, 0xF5, 0xA2, 0x00, 0x68, 0x74, 0x65, 0x73, 0x74, 0x3A, 0x62, 0x72, 0x69, 0x02, 0xFA, 0x40, 0x00, 0x00, 0x00};
       thing.decode(payload, sizeof(payload) / sizeof(uint8_t));
 
-      DimmeredLight light_compare = DimmeredLight(true, 2.0);
-      DimmeredLight value_light_test = light_test.getValue();
+      DimmedLight light_compare = DimmedLight(true, 2.0);
+      DimmedLight value_light_test = light_test.getValue();
       bool verify = (value_light_test == light_compare);
       REQUIRE(verify);
       REQUIRE(value_light_test.swi == light_compare.swi);
