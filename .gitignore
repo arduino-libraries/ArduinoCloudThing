@@ -14,3 +14,4 @@ Makefile
 
 .vscode
 .vs
+.DS_Store
