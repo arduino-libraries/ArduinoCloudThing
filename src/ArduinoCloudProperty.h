@@ -99,6 +99,7 @@ class CborMapData {
     MapEntry<double> base_time;
     MapEntry<String> name;
     MapEntry<String> attribute_name;
+    MapEntry<int>    property_position;
     MapEntry<float>  val;
     MapEntry<String> str_val;
     MapEntry<bool>   bool_val;
@@ -138,6 +139,9 @@ class ArduinoCloudProperty {
     inline String name() const {
       return _name;
     }
+    inline int position() const {
+      return _position;
+    }
     inline bool   isReadableByCloud() const {
       return (_permission == Permission::Read) || (_permission == Permission::ReadWrite);
     }
@@ -152,6 +156,7 @@ class ArduinoCloudProperty {
     void setLastLocalChangeTimestamp(unsigned long localChangeTime);
     unsigned long getLastCloudChangeTimestamp();
     unsigned long getLastLocalChangeTimestamp();
+    void setPosition(int pos);
 
     void updateLocalTimestamp();
     void append(CborEncoder * encoder);
@@ -173,6 +178,9 @@ class ArduinoCloudProperty {
     virtual void fromLocalToCloud() = 0;
     virtual void appendAttributesToCloudReal(CborEncoder *encoder) = 0;
     virtual void setAttributesFromCloud() = 0;
+    virtual String getAttributeNameByPosition(int position) {
+      return "";
+    };
     virtual bool isPrimitive() {
       return false;
     };
@@ -197,6 +205,8 @@ class ArduinoCloudProperty {
     unsigned long      _last_local_change_timestamp;
     unsigned long      _last_cloud_change_timestamp;
     LinkedList<CborMapData *> * _map_data_list;
+    /* Store the position of the property in the array list */
+    int                _position;
 };
 
 /******************************************************************************

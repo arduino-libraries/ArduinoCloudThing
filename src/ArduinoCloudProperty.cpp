@@ -23,12 +23,7 @@
 #endif
 
 static unsigned long getTimestamp() {
-  #ifdef ARDUINO_ARCH_SAMD
-  return rtc.getEpoch();
-  #else
-#pragma message "No RTC available on this architecture - ArduinoIoTCloud will not keep track of local change timestamps ."
-  return 0;
-  #endif
+    return 0;
 }
 
 /******************************************************************************
@@ -47,6 +42,7 @@ ArduinoCloudProperty::ArduinoCloudProperty()
       _update_interval_millis(0),
       _last_local_change_timestamp(0),
       _last_cloud_change_timestamp(0),
+      _position(0),
       _map_data_list(nullptr) {
 }
 
@@ -151,14 +147,23 @@ void ArduinoCloudProperty::appendAttributeReal(String value, String attributeNam
 }
 
 void ArduinoCloudProperty::appendAttributeName(String attributeName, std::function<void (CborEncoder& mapEncoder)>appendValue, CborEncoder *encoder) {
+  
   CborEncoder mapEncoder;
   cbor_encoder_create_map(encoder, &mapEncoder, 2);
   cbor_encode_int(&mapEncoder, static_cast<int>(CborIntegerMapKey::Name));
-  String completeName = _name;
-  if (attributeName != "") {
-    completeName += ":" + attributeName;
-  }
-  cbor_encode_text_stringz(&mapEncoder, completeName.c_str());
+
+  #ifdef SerialLoRa
+    Serial.println("I'm a lora device!");
+    cbor_encode_int(&mapEncoder, _position);
+  #else
+    Serial.println("I'm NOT a lora device!");
+    String completeName = _name;
+    if (attributeName != "") {
+      completeName += ":" + attributeName;
+    }
+    cbor_encode_text_stringz(&mapEncoder, completeName.c_str());
+  #endif
+
   appendValue(mapEncoder);
   cbor_encoder_close_container(encoder, &mapEncoder);
 }
@@ -232,4 +237,8 @@ unsigned long ArduinoCloudProperty::getLastCloudChangeTimestamp() {
 
 unsigned long ArduinoCloudProperty::getLastLocalChangeTimestamp() {
   return _last_local_change_timestamp;
+}
+
+void ArduinoCloudProperty::setPosition(int pos) {
+  _position = pos;
 }

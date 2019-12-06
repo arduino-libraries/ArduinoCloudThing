@@ -198,6 +198,17 @@ class CloudColor : public ArduinoCloudProperty {
       setAttribute(_cloud_value.sat);
       setAttribute(_cloud_value.bri);
     }
+    virtual String getAttributeNameByPosition(int position) {
+      if(position == 1) {
+        return "hue";
+      } else if (position == 2) {
+        return "sat";
+      } else if (position == 3) {
+        return "bri";
+      } else {
+        return "";
+      }
+    };
 };
 
 #endif /* CLOUDCOLOR_H_ */

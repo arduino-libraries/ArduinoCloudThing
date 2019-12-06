@@ -89,11 +89,13 @@ class ArduinoCloudThing {
     int appendChangedProperties(CborEncoder * arrayEncoder);
     void updateTimestampOnLocallyChangedProperties();
     void updateProperty(String propertyName, unsigned long cloudChangeEventTime);
+    String getPropertyNameByPosition(int propertyPosition);
 
   private:
     LinkedList<ArduinoCloudProperty *>   _property_list;
     /* Keep track of the number of primitive properties in the Thing. If 0 it allows the early exit in updateTimestampOnLocallyChangedProperties() */
     int                                  _numPrimitivesProperties;
+    int                                  _numProperties;
     /* Indicates the if the message received to be decoded is a response to the getLastValues inquiry */
     bool                                 _isSyncMessage;
     /* List of map data that will hold all the attributes of a property */
@@ -135,11 +137,13 @@ class ArduinoCloudThing {
 
     static bool   ifNumericConvertToDouble(CborValue * value_iter, double * numeric_val);
     static double convertCborHalfFloatToDouble(uint16_t const half_val);
-    void freeMapDataList(LinkedList<CborMapData *> *map_data_list);
+    void freeMapDataList(LinkedList<CborMapData *> * map_data_list);
     inline void addProperty(ArduinoCloudProperty   * property_obj) {
+      property_obj->setPosition(_numProperties);
       _property_list.add(property_obj);
     }
     ArduinoCloudProperty * getProperty(String const & name);
+    ArduinoCloudProperty * getProperty(int const & position);
 
 };
 

@@ -45,6 +45,7 @@ void PrintFreeRam(void) {
 
 ArduinoCloudThing::ArduinoCloudThing() :
   _numPrimitivesProperties(0),
+  _numProperties(0),
   _isSyncMessage(false),
   _currentPropertyName(""),
   _currentPropertyBaseTime(0),
@@ -92,9 +93,11 @@ ArduinoCloudProperty& ArduinoCloudThing::addPropertyReal(ArduinoCloudProperty & 
     if (property.isPrimitive()) {
       _numPrimitivesProperties++;
     }
+    _numProperties++;
     addProperty(&property);
     return (property);
   }
+  
 }
 
 void ArduinoCloudThing::decode(uint8_t const * const payload, size_t const length, bool isSyncMessage) {
@@ -174,6 +177,19 @@ ArduinoCloudProperty * ArduinoCloudThing::getProperty(String const & name) {
   for (int i = 0; i < _property_list.size(); i++) {
     ArduinoCloudProperty * p = _property_list.get(i);
     if (p->name() == name) {
+      return p;
+    }
+  }
+  return NULL;
+}
+
+ArduinoCloudProperty * ArduinoCloudThing::getProperty(int const & pos) {
+  // The alternative to evaluate is simply:
+  // return _property_list.get(pos-1);
+  // to be verified if the position in the list is ALWAYS the id of the property 
+  for (int i = 0; i < _property_list.size(); i++) {
+    ArduinoCloudProperty * p = _property_list.get(i);
+    if (p->position() == pos) {
       return p;
     }
   }
@@ -326,7 +342,31 @@ ArduinoCloudThing::MapParserState ArduinoCloudThing::handle_Name(CborValue * val
       map_data->attribute_name.set(attribute_name);
       next_state = MapParserState::MapKey;
     }
+  } else if (cbor_value_is_integer(value_iter)) {
+    int val = 0;
+    if (cbor_value_get_int(value_iter, &val) == CborNoError) {
+      Serial.print("Position to search is: ");
+      Serial.println(val);
+      String name = getPropertyNameByPosition(val);
+      Serial.print("Name of the property: ");
+      Serial.println(name);
+      map_data->name.set(name);
+      int colonPos = name.indexOf(":");
+      String attribute_name = "";
+      if (colonPos != -1) {
+        attribute_name = name.substring(colonPos + 1);
+      }
+      Serial.print("Name of the attribute: ");
+      Serial.println(name);
+      map_data->attribute_name.set(attribute_name);
+
+      if (cbor_value_advance(value_iter) == CborNoError) {
+        next_state = MapParserState::MapKey;
+      }
+    }
   }
+
+  
 
   return next_state;
 }
@@ -404,7 +444,6 @@ ArduinoCloudThing::MapParserState ArduinoCloudThing::handle_LeaveMap(CborValue *
     }
 
     if (_currentPropertyName != "" && propertyName != _currentPropertyName) {
-
       /* Update the property containers depending on the parsed data */
       updateProperty(_currentPropertyName, _currentPropertyBaseTime + _currentPropertyTime);
       /* Reset current property data */
@@ -461,6 +500,24 @@ void ArduinoCloudThing::updateProperty(String propertyName, unsigned long cloudC
     }
   }
 }
+
+String ArduinoCloudThing::getPropertyNameByPosition(int propertyPosition) {
+  if(propertyPosition>255) {
+    Serial.print("Position is: ");
+    Serial.println(propertyPosition & 255);
+    Serial.print("Sub-Position is: ");
+    Serial.println(propertyPosition >> 8);
+    ArduinoCloudProperty* property = getProperty(propertyPosition & 255);
+    String attributeName = property->getAttributeNameByPosition(propertyPosition >> 8);
+    return property->name() + ":" + attributeName;
+  } else {
+    Serial.print("Position is: ");
+    Serial.println(propertyPosition & 255);
+    ArduinoCloudProperty* property = getProperty(propertyPosition);
+    return property->name();
+  }
+}
+
 bool ArduinoCloudThing::ifNumericConvertToDouble(CborValue * value_iter, double * numeric_val) {
 
   if (cbor_value_is_integer(value_iter)) {
