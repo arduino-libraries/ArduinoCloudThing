@@ -154,7 +154,9 @@ void ArduinoCloudProperty::appendAttributeName(String attributeName, std::functi
 
   #ifdef SerialLoRa
     Serial.println("I'm a lora device!");
-    cbor_encode_int(&mapEncoder, _position);
+    int completePosition = getPostionByAttributeName(attributeName) * 256;
+    completePosition += _position; 
+    cbor_encode_int(&mapEncoder, completePosition);
   #else
     Serial.println("I'm NOT a lora device!");
     String completeName = _name;

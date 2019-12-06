@@ -357,7 +357,7 @@ ArduinoCloudThing::MapParserState ArduinoCloudThing::handle_Name(CborValue * val
         attribute_name = name.substring(colonPos + 1);
       }
       Serial.print("Name of the attribute: ");
-      Serial.println(name);
+      Serial.println(attribute_name);
       map_data->attribute_name.set(attribute_name);
 
       if (cbor_value_advance(value_iter) == CborNoError) {

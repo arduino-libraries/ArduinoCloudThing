@@ -181,6 +181,9 @@ class ArduinoCloudProperty {
     virtual String getAttributeNameByPosition(int position) {
       return "";
     };
+    virtual int getPostionByAttributeName(String attributeName) {
+      return 0;
+    };
     virtual bool isPrimitive() {
       return false;
     };

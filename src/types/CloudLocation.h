@@ -107,6 +107,15 @@ class CloudLocation : public ArduinoCloudProperty {
         return "";
       }
     };
+    virtual int getPostionByAttributeName(String attributeName) {
+      if(attributeName == "lat") {
+        return 1;
+      } else if (attributeName == "lon") {
+        return 2;
+      } else {
+        return 0;
+      }
+    };
 };
 
 #endif /* CLOUDLOCATION_H_ */
