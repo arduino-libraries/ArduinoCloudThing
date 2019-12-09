@@ -98,8 +98,11 @@ class CborMapData {
     MapEntry<String> base_name;
     MapEntry<double> base_time;
     MapEntry<String> name;
+    MapEntry<int>    name_identifier;
+    MapEntry<bool>   light_payload;
     MapEntry<String> attribute_name;
-    MapEntry<int>    property_position;
+    MapEntry<int>    attribute_identifier;
+    MapEntry<int>    property_identifier;
     MapEntry<float>  val;
     MapEntry<String> str_val;
     MapEntry<bool>   bool_val;
@@ -139,8 +142,8 @@ class ArduinoCloudProperty {
     inline String name() const {
       return _name;
     }
-    inline int position() const {
-      return _position;
+    inline int identifier() const {
+      return _identifier;
     }
     inline bool   isReadableByCloud() const {
       return (_permission == Permission::Read) || (_permission == Permission::ReadWrite);
@@ -156,10 +159,10 @@ class ArduinoCloudProperty {
     void setLastLocalChangeTimestamp(unsigned long localChangeTime);
     unsigned long getLastCloudChangeTimestamp();
     unsigned long getLastLocalChangeTimestamp();
-    void setPosition(int pos);
+    void setIdentifier(int identifier);
 
     void updateLocalTimestamp();
-    void append(CborEncoder * encoder);
+    void append(CborEncoder * encoder, bool lightPayload);
     void appendAttributeReal(bool value, String attributeName = "", CborEncoder *encoder = nullptr);
     void appendAttributeReal(int value, String attributeName = "", CborEncoder *encoder = nullptr);
     void appendAttributeReal(float value, String attributeName = "", CborEncoder *encoder = nullptr);
@@ -178,12 +181,6 @@ class ArduinoCloudProperty {
     virtual void fromLocalToCloud() = 0;
     virtual void appendAttributesToCloudReal(CborEncoder *encoder) = 0;
     virtual void setAttributesFromCloud() = 0;
-    virtual String getAttributeNameByPosition(int position) {
-      return "";
-    };
-    virtual int getPostionByAttributeName(String attributeName) {
-      return 0;
-    };
     virtual bool isPrimitive() {
       return false;
     };
@@ -208,8 +205,11 @@ class ArduinoCloudProperty {
     unsigned long      _last_local_change_timestamp;
     unsigned long      _last_cloud_change_timestamp;
     LinkedList<CborMapData *> * _map_data_list;
-    /* Store the position of the property in the array list */
-    int                _position;
+    /* Store the identifier of the property in the array list */
+    int                _identifier;
+    int                _attributeIdentifier;
+    /* Indicates if the property shall be encoded using the identifier instead of the name */
+    bool               _lightPayload;
 };
 
 /******************************************************************************

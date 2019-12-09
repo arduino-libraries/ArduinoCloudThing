@@ -81,15 +81,15 @@ class ArduinoCloudThing {
     ArduinoCloudProperty   & addPropertyReal(ArduinoCloudProperty   & property, String const & name, Permission const permission);
 
     /* encode return > 0 if a property has changed and encodes the changed properties in CBOR format into the provided buffer */
-    int encode(uint8_t * data, size_t const size);
+    int encode(uint8_t * data, size_t const size, bool lightPayload = false);
     /* decode a CBOR payload received from the cloud */
     void decode(uint8_t const * const payload, size_t const length, bool isSyncMessage = false);
 
     bool isPropertyInContainer(String const & name);
-    int appendChangedProperties(CborEncoder * arrayEncoder);
+    int appendChangedProperties(CborEncoder * arrayEncoder, bool lightPayload);
     void updateTimestampOnLocallyChangedProperties();
     void updateProperty(String propertyName, unsigned long cloudChangeEventTime);
-    String getPropertyNameByPosition(int propertyPosition);
+    String getPropertyNameByIdentifier(int propertyIdentifier);
 
   private:
     LinkedList<ArduinoCloudProperty *>   _property_list;
@@ -139,11 +139,11 @@ class ArduinoCloudThing {
     static double convertCborHalfFloatToDouble(uint16_t const half_val);
     void freeMapDataList(LinkedList<CborMapData *> * map_data_list);
     inline void addProperty(ArduinoCloudProperty   * property_obj) {
-      property_obj->setPosition(_numProperties);
+      property_obj->setIdentifier(_numProperties);
       _property_list.add(property_obj);
     }
     ArduinoCloudProperty * getProperty(String const & name);
-    ArduinoCloudProperty * getProperty(int const & position);
+    ArduinoCloudProperty * getProperty(int const & identifier);
 
 };
 

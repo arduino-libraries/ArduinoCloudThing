@@ -83,7 +83,6 @@ class CloudLocation : public ArduinoCloudProperty {
       return _value;
     }
 
-
     virtual void fromCloudToLocal() {
       _value = _cloud_value;
     }
@@ -98,24 +97,6 @@ class CloudLocation : public ArduinoCloudProperty {
       setAttribute(_cloud_value.lat);
       setAttribute(_cloud_value.lon);
     }
-    virtual String getAttributeNameByPosition(int position) {
-      if(position == 1) {
-        return "lat";
-      } else if (position == 2) {
-        return "lon";
-      } else {
-        return "";
-      }
-    };
-    virtual int getPostionByAttributeName(String attributeName) {
-      if(attributeName == "lat") {
-        return 1;
-      } else if (attributeName == "lon") {
-        return 2;
-      } else {
-        return 0;
-      }
-    };
 };
 
 #endif /* CLOUDLOCATION_H_ */

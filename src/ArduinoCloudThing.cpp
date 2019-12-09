@@ -59,7 +59,8 @@ ArduinoCloudThing::ArduinoCloudThing() :
 void ArduinoCloudThing::begin() {
 }
 
-int ArduinoCloudThing::encode(uint8_t * data, size_t const size) {
+int ArduinoCloudThing::encode(uint8_t * data, size_t const size, bool lightPayload) {
+
   // check if backing storage and cloud has diverged
   // time interval may be elapsed or property may be changed
   CborEncoder encoder, arrayEncoder;
@@ -70,7 +71,7 @@ int ArduinoCloudThing::encode(uint8_t * data, size_t const size) {
     return -1;
   }
 
-  if (appendChangedProperties(&arrayEncoder) < 1) {
+  if (appendChangedProperties(&arrayEncoder, lightPayload) < 1) {
     return -1;
   }
 
@@ -161,18 +162,19 @@ bool ArduinoCloudThing::isPropertyInContainer(String const & name) {
   return false;
 }
 
-int ArduinoCloudThing::appendChangedProperties(CborEncoder * arrayEncoder) {
+int ArduinoCloudThing::appendChangedProperties(CborEncoder * arrayEncoder, bool lightPayload) {
   int appendedProperties = 0;
   for (int i = 0; i < _property_list.size(); i++) {
     ArduinoCloudProperty * p = _property_list.get(i);
     if (p->shouldBeUpdated() && p->isReadableByCloud()) {
-      p->append(arrayEncoder);
+      p->append(arrayEncoder, lightPayload);
       appendedProperties++;
     }
   }
   return appendedProperties;
 }
 
+//retrieve property by name
 ArduinoCloudProperty * ArduinoCloudThing::getProperty(String const & name) {
   for (int i = 0; i < _property_list.size(); i++) {
     ArduinoCloudProperty * p = _property_list.get(i);
@@ -183,13 +185,11 @@ ArduinoCloudProperty * ArduinoCloudThing::getProperty(String const & name) {
   return NULL;
 }
 
+//retrieve property by identifier
 ArduinoCloudProperty * ArduinoCloudThing::getProperty(int const & pos) {
-  // The alternative to evaluate is simply:
-  // return _property_list.get(pos-1);
-  // to be verified if the position in the list is ALWAYS the id of the property 
   for (int i = 0; i < _property_list.size(); i++) {
     ArduinoCloudProperty * p = _property_list.get(i);
-    if (p->position() == pos) {
+    if (p->identifier() == pos) {
       return p;
     }
   }
@@ -345,20 +345,13 @@ ArduinoCloudThing::MapParserState ArduinoCloudThing::handle_Name(CborValue * val
   } else if (cbor_value_is_integer(value_iter)) {
     int val = 0;
     if (cbor_value_get_int(value_iter, &val) == CborNoError) {
-      Serial.print("Position to search is: ");
-      Serial.println(val);
-      String name = getPropertyNameByPosition(val);
-      Serial.print("Name of the property: ");
-      Serial.println(name);
+      map_data->light_payload.set(true);
+      map_data->name_identifier.set(val&255);
+      map_data->attribute_identifier.set(val>>8);
+      map_data->light_payload.set(true);
+      String name = getPropertyNameByIdentifier(val);
       map_data->name.set(name);
-      int colonPos = name.indexOf(":");
-      String attribute_name = "";
-      if (colonPos != -1) {
-        attribute_name = name.substring(colonPos + 1);
-      }
-      Serial.print("Name of the attribute: ");
-      Serial.println(attribute_name);
-      map_data->attribute_name.set(attribute_name);
+      
 
       if (cbor_value_advance(value_iter) == CborNoError) {
         next_state = MapParserState::MapKey;
@@ -501,21 +494,15 @@ void ArduinoCloudThing::updateProperty(String propertyName, unsigned long cloudC
   }
 }
 
-String ArduinoCloudThing::getPropertyNameByPosition(int propertyPosition) {
-  if(propertyPosition>255) {
-    Serial.print("Position is: ");
-    Serial.println(propertyPosition & 255);
-    Serial.print("Sub-Position is: ");
-    Serial.println(propertyPosition >> 8);
-    ArduinoCloudProperty* property = getProperty(propertyPosition & 255);
-    String attributeName = property->getAttributeNameByPosition(propertyPosition >> 8);
-    return property->name() + ":" + attributeName;
+// retrieve the property name by the identifier
+String ArduinoCloudThing::getPropertyNameByIdentifier(int propertyIdentifier) {
+  ArduinoCloudProperty* property;
+  if(propertyIdentifier>255) {
+    property = getProperty(propertyIdentifier & 255);
   } else {
-    Serial.print("Position is: ");
-    Serial.println(propertyPosition & 255);
-    ArduinoCloudProperty* property = getProperty(propertyPosition);
-    return property->name();
+    property = getProperty(propertyIdentifier);
   }
+  return property->name();
 }
 
 bool ArduinoCloudThing::ifNumericConvertToDouble(CborValue * value_iter, double * numeric_val) {

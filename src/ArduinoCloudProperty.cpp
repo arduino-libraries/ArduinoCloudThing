@@ -42,7 +42,9 @@ ArduinoCloudProperty::ArduinoCloudProperty()
       _update_interval_millis(0),
       _last_local_change_timestamp(0),
       _last_cloud_change_timestamp(0),
-      _position(0),
+      _identifier(0),
+      _lightPayload(false),
+      _attributeIdentifier(0),
       _map_data_list(nullptr) {
 }
 
@@ -111,7 +113,9 @@ void ArduinoCloudProperty::execCallbackOnSync() {
   }
 }
 
-void ArduinoCloudProperty::append(CborEncoder *encoder) {
+void ArduinoCloudProperty::append(CborEncoder *encoder, bool lightPayload) {
+  _lightPayload = lightPayload;
+  _attributeIdentifier = 0;
   appendAttributesToCloudReal(encoder);
   fromLocalToCloud();
   _has_been_updated_once = true;
@@ -147,31 +151,31 @@ void ArduinoCloudProperty::appendAttributeReal(String value, String attributeNam
 }
 
 void ArduinoCloudProperty::appendAttributeName(String attributeName, std::function<void (CborEncoder& mapEncoder)>appendValue, CborEncoder *encoder) {
-  
+  if(attributeName != ""){
+    _attributeIdentifier++;
+  }
   CborEncoder mapEncoder;
   cbor_encoder_create_map(encoder, &mapEncoder, 2);
   cbor_encode_int(&mapEncoder, static_cast<int>(CborIntegerMapKey::Name));
 
-  #ifdef SerialLoRa
-    Serial.println("I'm a lora device!");
-    int completePosition = getPostionByAttributeName(attributeName) * 256;
-    completePosition += _position; 
-    cbor_encode_int(&mapEncoder, completePosition);
-  #else
-    Serial.println("I'm NOT a lora device!");
+  if(_lightPayload) {
+    int completeIdentifier = _attributeIdentifier * 256;
+    completeIdentifier += _identifier; 
+    cbor_encode_int(&mapEncoder, completeIdentifier);
+  } else {
     String completeName = _name;
     if (attributeName != "") {
       completeName += ":" + attributeName;
     }
     cbor_encode_text_stringz(&mapEncoder, completeName.c_str());
-  #endif
-
+  }
   appendValue(mapEncoder);
   cbor_encoder_close_container(encoder, &mapEncoder);
 }
 
 void ArduinoCloudProperty::setAttributesFromCloud(LinkedList<CborMapData *> *map_data_list) {
   _map_data_list = map_data_list;
+  _attributeIdentifier = 0;
   setAttributesFromCloud();
 }
 
@@ -200,16 +204,28 @@ void ArduinoCloudProperty::setAttributeReal(String& value, String attributeName)
 }
 
 void ArduinoCloudProperty::setAttributeReal(String attributeName, std::function<void (CborMapData *md)>setValue) {
+  if(attributeName != ""){
+    _attributeIdentifier++;
+  }
   for (int i = 0; i < _map_data_list->size(); i++) {
     CborMapData *map = _map_data_list->get(i);
     if (map != nullptr) {
-      String an = map->attribute_name.get();
-      if (an == attributeName) {
-        setValue(map);
-        break;
+      if(map->light_payload.isSet() && map->light_payload.get()) {
+        int attid = map->attribute_identifier.get();
+        if (attid == _attributeIdentifier) {
+          setValue(map);
+          break;
+        }
+      } else {
+        String an = map->attribute_name.get();
+        if (an == attributeName) {
+          setValue(map);
+          break;
+        }
       }
     }
   }
+   
 }
 
 String ArduinoCloudProperty::getAttributeName(String propertyName, char separator) {
@@ -241,6 +257,6 @@ unsigned long ArduinoCloudProperty::getLastLocalChangeTimestamp() {
   return _last_local_change_timestamp;
 }
 
-void ArduinoCloudProperty::setPosition(int pos) {
-  _position = pos;
+void ArduinoCloudProperty::setIdentifier(int identifier) {
+  _identifier = identifier;
 }
