@@ -42,10 +42,10 @@ ArduinoCloudProperty::ArduinoCloudProperty()
       _update_interval_millis(0),
       _last_local_change_timestamp(0),
       _last_cloud_change_timestamp(0),
+      _map_data_list(nullptr),
       _identifier(0),
-      _lightPayload(false),
       _attributeIdentifier(0),
-      _map_data_list(nullptr) {
+      _lightPayload(false) {
 }
 
 /******************************************************************************
