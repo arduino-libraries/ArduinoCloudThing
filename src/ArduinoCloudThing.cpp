@@ -86,7 +86,7 @@ int ArduinoCloudThing::encode(uint8_t * data, size_t const size, bool lightPaylo
   return bytes_encoded;
 }
 
-ArduinoCloudProperty& ArduinoCloudThing::addPropertyReal(ArduinoCloudProperty & property, String const & name, Permission const permission) {
+ArduinoCloudProperty& ArduinoCloudThing::addPropertyReal(ArduinoCloudProperty & property, String const & name, Permission const permission, int propertyIdentifier) {
   property.init(name, permission);
   if (isPropertyInContainer(name)) {
     return (*getProperty(name));
@@ -95,7 +95,7 @@ ArduinoCloudProperty& ArduinoCloudThing::addPropertyReal(ArduinoCloudProperty & 
       _numPrimitivesProperties++;
     }
     _numProperties++;
-    addProperty(&property);
+    addProperty(&property, propertyIdentifier);
     return (property);
   }
   
