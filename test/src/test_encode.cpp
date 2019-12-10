@@ -47,9 +47,9 @@ SCENARIO("Arduino Cloud Properties are encoded", "[ArduinoCloudThing::encode]") 
       encode(thing);
 
       CloudBool test = true;
-      thing.addPropertyReal(test, "test", Permission::ReadWrite);
+      thing.addPropertyReal(test, "test", Permission::ReadWrite, 1);
 
-      /* [{0: "test", 4: true}] = 9F A2 00 01 04 F5 FF*/
+      /* [{0: 1, 4: true}] = 9F A2 00 01 04 F5 FF*/
       std::vector<uint8_t> const expected = {0x9F, 0xA2, 0x00, 0x01, 0x04, 0xF5, 0xFF};
       std::vector<uint8_t> const actual = encode(thing, true);
       REQUIRE(actual == expected);
@@ -156,9 +156,9 @@ SCENARIO("Arduino Cloud Properties are encoded", "[ArduinoCloudThing::encode]") 
       encode(thing);
 
       CloudColor color_test = CloudColor(2.0, 2.0, 2.0);
-      thing.addPropertyReal(color_test, "test", Permission::ReadWrite);
+      thing.addPropertyReal(color_test, "test", Permission::ReadWrite, 1);
 
-      /* [{0: "test:hue", 2: 2.0},{0: "test:sat", 2: 2.0},{0: "test:bri", 2: 2.0}] = 9F A2 00 19 01 01 02 FA 40 00 00 00 A2 00 19 02 01 02 FA 40 00 00 00 A2 00 19 03 01 02 FA 40 00 00 00 FF*/
+      /* [{0: 257, 2: 2.0},{0: 513, 2: 2.0},{0: 769, 2: 2.0}] = 9F A2 00 19 01 01 02 FA 40 00 00 00 A2 00 19 02 01 02 FA 40 00 00 00 A2 00 19 03 01 02 FA 40 00 00 00 FF*/
       std::vector<uint8_t> const expected = {0x9F, 0xA2, 0x00, 0x19, 0x01, 0x01, 0x02, 0xFA, 0x40, 0x00, 0x00, 0x00, 0xA2, 0x00, 0x19, 0x02, 0x01, 0x02, 0xFA, 0x40, 0x00, 0x00, 0x00, 0xA2, 0x00, 0x19, 0x03, 0x01, 0x02, 0xFA, 0x40, 0x00, 0x00, 0x00, 0xFF };
       std::vector<uint8_t> const actual = encode(thing, true);
       REQUIRE(actual == expected);

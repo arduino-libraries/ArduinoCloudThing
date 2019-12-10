@@ -56,9 +56,9 @@ SCENARIO("Arduino Cloud Properties are decoded", "[ArduinoCloudThing::decode]") 
       thing.begin();
 
       CloudBool test = true;
-      thing.addPropertyReal(test, "test", Permission::ReadWrite);
+      thing.addPropertyReal(test, "test", Permission::ReadWrite, 1);
 
-      /* [{0: "test", 4: false}] = 81 A2 00 01 04 F4 */
+      /* [{0: 1, 4: false}] = 81 A2 00 01 04 F4 */
       uint8_t const payload[] = {0x81, 0xA2, 0x00, 0x01, 0x04, 0xF4};
       int const payload_length = sizeof(payload) / sizeof(uint8_t);
       thing.decode(payload, payload_length);
@@ -192,9 +192,9 @@ SCENARIO("Arduino Cloud Properties are decoded", "[ArduinoCloudThing::decode]") 
 
       CloudColor color_test = CloudColor(0.0, 0.0, 0.0);
 
-      thing.addPropertyReal(color_test, "test", Permission::ReadWrite);
+      thing.addPropertyReal(color_test, "test", Permission::ReadWrite, 1);
 
-      /* [{0: "test:hue", 2: 2.0},{0: "test:sat", 2: 2.0},{0: "test:bri", 2: 2.0}] = 83 A2 00 19 01 01 02 FA 40 00 00 00 A2 00 19 02 01 02 FA 40 00 00 00 A2 00 19 03 01 02 FA 40 00 00 00 */
+      /* [{0: 257, 2: 2.0},{0: 513, 2: 2.0},{0: 769, 2: 2.0}] = 83 A2 00 19 01 01 02 FA 40 00 00 00 A2 00 19 02 01 02 FA 40 00 00 00 A2 00 19 03 01 02 FA 40 00 00 00 */
       uint8_t const payload[] = {0x83, 0xA2, 0x00, 0x19, 0x01, 0x01, 0x02, 0xFA, 0x40, 0x00, 0x00, 0x00, 0xA2, 0x00, 0x19, 0x02, 0x01, 0x02, 0xFA, 0x40, 0x00, 0x00, 0x00, 0xA2, 0x00, 0x19, 0x03, 0x01, 0x02, 0xFA, 0x40, 0x00, 0x00, 0x00 };
       thing.decode(payload, sizeof(payload) / sizeof(uint8_t));
 
