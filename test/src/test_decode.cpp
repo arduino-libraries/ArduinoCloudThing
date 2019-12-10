@@ -183,7 +183,7 @@ SCENARIO("Arduino Cloud Properties are decoded", "[ArduinoCloudThing::decode]") 
     }
   }
 
-    /************************************************************************************/
+  /************************************************************************************/
 
   WHEN("A Color property is changed via CBOR message - light payload") {
     GIVEN("CloudProtocol::V2") {

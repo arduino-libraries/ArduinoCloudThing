@@ -98,7 +98,7 @@ ArduinoCloudProperty& ArduinoCloudThing::addPropertyReal(ArduinoCloudProperty & 
     addProperty(&property, propertyIdentifier);
     return (property);
   }
-  
+
 }
 
 void ArduinoCloudThing::decode(uint8_t const * const payload, size_t const length, bool isSyncMessage) {
@@ -346,12 +346,12 @@ ArduinoCloudThing::MapParserState ArduinoCloudThing::handle_Name(CborValue * val
     int val = 0;
     if (cbor_value_get_int(value_iter, &val) == CborNoError) {
       map_data->light_payload.set(true);
-      map_data->name_identifier.set(val&255);
-      map_data->attribute_identifier.set(val>>8);
+      map_data->name_identifier.set(val & 255);
+      map_data->attribute_identifier.set(val >> 8);
       map_data->light_payload.set(true);
       String name = getPropertyNameByIdentifier(val);
       map_data->name.set(name);
-      
+
 
       if (cbor_value_advance(value_iter) == CborNoError) {
         next_state = MapParserState::MapKey;
@@ -359,7 +359,7 @@ ArduinoCloudThing::MapParserState ArduinoCloudThing::handle_Name(CborValue * val
     }
   }
 
-  
+
 
   return next_state;
 }
@@ -497,7 +497,7 @@ void ArduinoCloudThing::updateProperty(String propertyName, unsigned long cloudC
 // retrieve the property name by the identifier
 String ArduinoCloudThing::getPropertyNameByIdentifier(int propertyIdentifier) {
   ArduinoCloudProperty* property;
-  if(propertyIdentifier>255) {
+  if (propertyIdentifier > 255) {
     property = getProperty(propertyIdentifier & 255);
   } else {
     property = getProperty(propertyIdentifier);

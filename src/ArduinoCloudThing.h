@@ -78,7 +78,7 @@ class ArduinoCloudThing {
 
     void begin();
 
-    ArduinoCloudProperty   & addPropertyReal(ArduinoCloudProperty   & property, String const & name, Permission const permission, int propertyIdentifier);
+    ArduinoCloudProperty   & addPropertyReal(ArduinoCloudProperty   & property, String const & name, Permission const permission, int propertyIdentifier = -1);
 
     /* encode return > 0 if a property has changed and encodes the changed properties in CBOR format into the provided buffer */
     int encode(uint8_t * data, size_t const size, bool lightPayload = false);
@@ -139,7 +139,7 @@ class ArduinoCloudThing {
     static double convertCborHalfFloatToDouble(uint16_t const half_val);
     void freeMapDataList(LinkedList<CborMapData *> * map_data_list);
     inline void addProperty(ArduinoCloudProperty   * property_obj, int propertyIdentifier) {
-      if(propertyIdentifier != -1) {
+      if (propertyIdentifier != -1) {
         property_obj->setIdentifier(propertyIdentifier);
       } else {
         property_obj->setIdentifier(_numProperties);

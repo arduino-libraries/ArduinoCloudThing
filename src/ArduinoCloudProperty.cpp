@@ -23,7 +23,7 @@
 #endif
 
 static unsigned long getTimestamp() {
-    return 0;
+  return 0;
 }
 
 /******************************************************************************
@@ -151,16 +151,16 @@ void ArduinoCloudProperty::appendAttributeReal(String value, String attributeNam
 }
 
 void ArduinoCloudProperty::appendAttributeName(String attributeName, std::function<void (CborEncoder& mapEncoder)>appendValue, CborEncoder *encoder) {
-  if(attributeName != ""){
+  if (attributeName != "") {
     _attributeIdentifier++;
   }
   CborEncoder mapEncoder;
   cbor_encoder_create_map(encoder, &mapEncoder, 2);
   cbor_encode_int(&mapEncoder, static_cast<int>(CborIntegerMapKey::Name));
 
-  if(_lightPayload) {
+  if (_lightPayload) {
     int completeIdentifier = _attributeIdentifier * 256;
-    completeIdentifier += _identifier; 
+    completeIdentifier += _identifier;
     cbor_encode_int(&mapEncoder, completeIdentifier);
   } else {
     String completeName = _name;
@@ -204,13 +204,13 @@ void ArduinoCloudProperty::setAttributeReal(String& value, String attributeName)
 }
 
 void ArduinoCloudProperty::setAttributeReal(String attributeName, std::function<void (CborMapData *md)>setValue) {
-  if(attributeName != ""){
+  if (attributeName != "") {
     _attributeIdentifier++;
   }
   for (int i = 0; i < _map_data_list->size(); i++) {
     CborMapData *map = _map_data_list->get(i);
     if (map != nullptr) {
-      if(map->light_payload.isSet() && map->light_payload.get()) {
+      if (map->light_payload.isSet() && map->light_payload.get()) {
         int attid = map->attribute_identifier.get();
         if (attid == _attributeIdentifier) {
           setValue(map);
@@ -225,7 +225,7 @@ void ArduinoCloudProperty::setAttributeReal(String attributeName, std::function<
       }
     }
   }
-   
+
 }
 
 String ArduinoCloudProperty::getAttributeName(String propertyName, char separator) {
