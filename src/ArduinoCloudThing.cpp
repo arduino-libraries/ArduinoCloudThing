@@ -328,6 +328,7 @@ ArduinoCloudThing::MapParserState ArduinoCloudThing::handle_Name(CborValue * val
   MapParserState next_state = MapParserState::Error;
 
   if (cbor_value_is_text_string(value_iter)) {
+    // if the value in the cbor message is a string, it corresponds to the name of the property to be updated (int the form [property_name]:[attribute_name])
     char * val      = nullptr;
     size_t val_size = 0;
     if (cbor_value_dup_text_string(value_iter, &val, &val_size, value_iter) == CborNoError) {
@@ -343,6 +344,7 @@ ArduinoCloudThing::MapParserState ArduinoCloudThing::handle_Name(CborValue * val
       next_state = MapParserState::MapKey;
     }
   } else if (cbor_value_is_integer(value_iter)) {
+    // if the value in the cbor message is an integer, a light payload has been used and an integer identifier should be decode in order to retrieve the corresponding property and attribute name to be updated
     int val = 0;
     if (cbor_value_get_int(value_iter, &val) == CborNoError) {
       map_data->light_payload.set(true);

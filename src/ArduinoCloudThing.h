@@ -77,10 +77,11 @@ class ArduinoCloudThing {
     ArduinoCloudThing();
 
     void begin();
-
+    //if propertyIdentifier is different from -1, an integer identifier is associated to the added property to be use instead of the property name when the parameter lightPayload is true in the encode method
     ArduinoCloudProperty   & addPropertyReal(ArduinoCloudProperty   & property, String const & name, Permission const permission, int propertyIdentifier = -1);
 
     /* encode return > 0 if a property has changed and encodes the changed properties in CBOR format into the provided buffer */
+    /* if lightPayload is true the integer identifier of the property will be encoded in the message instead of the property name in order to reduce the size of the message payload*/
     int encode(uint8_t * data, size_t const size, bool lightPayload = false);
     /* decode a CBOR payload received from the cloud */
     void decode(uint8_t const * const payload, size_t const length, bool isSyncMessage = false);
@@ -142,6 +143,7 @@ class ArduinoCloudThing {
       if (propertyIdentifier != -1) {
         property_obj->setIdentifier(propertyIdentifier);
       } else {
+        // if property identifier is -1, an incremental value will be assigned as identifier.
         property_obj->setIdentifier(_numProperties);
       }
       _property_list.add(property_obj);

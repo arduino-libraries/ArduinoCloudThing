@@ -51,11 +51,13 @@ SCENARIO("Arduino Cloud Properties are decoded", "[ArduinoCloudThing::decode]") 
   /************************************************************************************/
 
   WHEN("A boolean property is changed via CBOR message - light payload") {
+    /*An integer identifier has been encoded instead of the name of the property in order to have a shorter payload*/
     GIVEN("CloudProtocol::V2") {
       ArduinoCloudThing thing;
       thing.begin();
 
       CloudBool test = true;
+      /*The property is added with identifier 1 that will be used instead of the string "test" as property identifier*/
       thing.addPropertyReal(test, "test", Permission::ReadWrite, 1);
 
       /* [{0: 1, 4: false}] = 81 A2 00 01 04 F4 */
@@ -186,12 +188,14 @@ SCENARIO("Arduino Cloud Properties are decoded", "[ArduinoCloudThing::decode]") 
   /************************************************************************************/
 
   WHEN("A Color property is changed via CBOR message - light payload") {
+    /*An integer identifier has been encoded instead of the name of the property in order to have a shorter payload*/
     GIVEN("CloudProtocol::V2") {
       ArduinoCloudThing thing;
       thing.begin();
 
       CloudColor color_test = CloudColor(0.0, 0.0, 0.0);
 
+      /*The property is added with identifier 1 that will be used instead of the string "test" as property identifier*/
       thing.addPropertyReal(color_test, "test", Permission::ReadWrite, 1);
 
       /* [{0: 257, 2: 2.0},{0: 513, 2: 2.0},{0: 769, 2: 2.0}] = 83 A2 00 19 01 01 02 FA 40 00 00 00 A2 00 19 02 01 02 FA 40 00 00 00 A2 00 19 03 01 02 FA 40 00 00 00 */

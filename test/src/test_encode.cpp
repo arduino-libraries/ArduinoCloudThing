@@ -41,12 +41,14 @@ SCENARIO("Arduino Cloud Properties are encoded", "[ArduinoCloudThing::encode]") 
   /************************************************************************************/
 
   WHEN("A 'bool' property is added - light payload") {
+    /*An integer identifier must be instead of the name of the property in order to have a shorter payload*/
     GIVEN("CloudProtocol::V2") {
       ArduinoCloudThing thing;
       thing.begin();
       encode(thing);
 
       CloudBool test = true;
+      /*The property is added with identifier 1 that will be used instead of the string "test" as property identifier*/
       thing.addPropertyReal(test, "test", Permission::ReadWrite, 1);
 
       /* [{0: 1, 4: true}] = 9F A2 00 01 04 F5 FF*/
@@ -150,12 +152,14 @@ SCENARIO("Arduino Cloud Properties are encoded", "[ArduinoCloudThing::encode]") 
   /************************************************************************************/
 
   WHEN("A 'Color' property is added - light payload") {
+    /*An integer identifier must be encoded instead of the name of the property in order to have a shorter payload*/
     GIVEN("CloudProtocol::V2") {
       ArduinoCloudThing thing;
       thing.begin();
       encode(thing);
 
       CloudColor color_test = CloudColor(2.0, 2.0, 2.0);
+      /*The property is added with identifier 1 that will be used instead of the string "name" as property identifier */
       thing.addPropertyReal(color_test, "test", Permission::ReadWrite, 1);
 
       /* [{0: 257, 2: 2.0},{0: 513, 2: 2.0},{0: 769, 2: 2.0}] = 9F A2 00 19 01 01 02 FA 40 00 00 00 A2 00 19 02 01 02 FA 40 00 00 00 A2 00 19 03 01 02 FA 40 00 00 00 FF*/
