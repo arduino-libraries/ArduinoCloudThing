@@ -23,7 +23,12 @@
 #endif
 
 static unsigned long getTimestamp() {
+  #ifdef ARDUINO_ARCH_SAMD
+  return rtc.getEpoch();
+  #else
+#pragma message "No RTC available on this architecture - ArduinoIoTCloud will not keep track of local change timestamps ."
   return 0;
+  #endif
 }
 
 /******************************************************************************
