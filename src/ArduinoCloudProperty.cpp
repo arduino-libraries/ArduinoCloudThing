@@ -170,7 +170,22 @@ void ArduinoCloudProperty::setAttributesFromCloud(LinkedList<CborMapData *> *map
 
 void ArduinoCloudProperty::setAttributeReal(bool& value, String attributeName) {
   setAttributeReal(attributeName, [&value](CborMapData * md) {
-    value = md->bool_val.get();
+    // Manage the case to have boolean values received as integers 0/1
+    if (md->bool_val.isSet()) {
+      Serial.println("1");
+      value = md->bool_val.get();
+    } else if (md->val.isSet()) {
+      if (md->val.get() == 0) {
+        Serial.println("2");
+        value = false;
+      } else if (md->val.get() == 1) {
+        Serial.println("3");
+        value = true;
+      } else {
+        Serial.println("4");
+        /* This should not happen. Leave the previous value */
+      }
+    }
   });
 }
 
