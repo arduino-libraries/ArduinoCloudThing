@@ -15,9 +15,9 @@
    PUBLIC FUNCTIONS
  **************************************************************************************/
 
-std::vector<uint8_t> encode(ArduinoCloudThing & thing) {
+std::vector<uint8_t> encode(ArduinoCloudThing & thing, bool lightPayload) {
   uint8_t buf[200] = {0};
-  int const bytes_buf = thing.encode(buf, 200);
+  int const bytes_buf = thing.encode(buf, 200, lightPayload);
   if (bytes_buf == -1) {
     return std::vector<uint8_t>();
   } else {

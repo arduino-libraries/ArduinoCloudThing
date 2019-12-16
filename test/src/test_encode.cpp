@@ -40,6 +40,26 @@ SCENARIO("Arduino Cloud Properties are encoded", "[ArduinoCloudThing::encode]") 
 
   /************************************************************************************/
 
+  WHEN("A 'bool' property is added - light payload") {
+    /*An integer identifier must be instead of the name of the property in order to have a shorter payload*/
+    GIVEN("CloudProtocol::V2") {
+      ArduinoCloudThing thing;
+      thing.begin();
+      encode(thing);
+
+      CloudBool test = true;
+      /*The property is added with identifier 1 that will be used instead of the string "test" as property identifier*/
+      thing.addPropertyReal(test, "test", Permission::ReadWrite, 1);
+
+      /* [{0: 1, 4: true}] = 9F A2 00 01 04 F5 FF*/
+      std::vector<uint8_t> const expected = {0x9F, 0xA2, 0x00, 0x01, 0x04, 0xF5, 0xFF};
+      std::vector<uint8_t> const actual = encode(thing, true);
+      REQUIRE(actual == expected);
+    }
+  }
+
+  /************************************************************************************/
+
   WHEN("A 'int' property is added") {
     GIVEN("CloudProtocol::V2") {
       ArduinoCloudThing thing;
@@ -125,6 +145,26 @@ SCENARIO("Arduino Cloud Properties are encoded", "[ArduinoCloudThing::encode]") 
       /* [{0: "test:hue", 2: 2.0},{0: "test:sat", 2: 2.0},{0: "test:bri", 2: 2.0}] = 9F A2 00 68 74 65 73 74 3A 68 75 65 02 FA 40 00 00 00 A2 00 68 74 65 73 74 3A 73 61 74 02 FA 40 00 00 00 A2 00 68 74 65 73 74 3A 62 72 69 02 FA 40 00 00 00 FF*/
       std::vector<uint8_t> const expected = {0x9F, 0xA2, 0x00, 0x68, 0x74, 0x65, 0x73, 0x74, 0x3A, 0x68, 0x75, 0x65, 0x02, 0xFA, 0x40, 0x00, 0x00, 0x00, 0xA2, 0x00, 0x68, 0x74, 0x65, 0x73, 0x74, 0x3A, 0x73, 0x61, 0x74, 0x02, 0xFA, 0x40, 0x00, 0x00, 0x00, 0xA2, 0x00, 0x68, 0x74, 0x65, 0x73, 0x74, 0x3A, 0x62, 0x72, 0x69, 0x02, 0xFA, 0x40, 0x00, 0x00, 0x00, 0xFF };
       std::vector<uint8_t> const actual = encode(thing);
+      REQUIRE(actual == expected);
+    }
+  }
+
+  /************************************************************************************/
+
+  WHEN("A 'Color' property is added - light payload") {
+    /*An integer identifier must be encoded instead of the name of the property in order to have a shorter payload*/
+    GIVEN("CloudProtocol::V2") {
+      ArduinoCloudThing thing;
+      thing.begin();
+      encode(thing);
+
+      CloudColor color_test = CloudColor(2.0, 2.0, 2.0);
+      /*The property is added with identifier 1 that will be used instead of the string "name" as property identifier */
+      thing.addPropertyReal(color_test, "test", Permission::ReadWrite, 1);
+
+      /* [{0: 257, 2: 2.0},{0: 513, 2: 2.0},{0: 769, 2: 2.0}] = 9F A2 00 19 01 01 02 FA 40 00 00 00 A2 00 19 02 01 02 FA 40 00 00 00 A2 00 19 03 01 02 FA 40 00 00 00 FF*/
+      std::vector<uint8_t> const expected = {0x9F, 0xA2, 0x00, 0x19, 0x01, 0x01, 0x02, 0xFA, 0x40, 0x00, 0x00, 0x00, 0xA2, 0x00, 0x19, 0x02, 0x01, 0x02, 0xFA, 0x40, 0x00, 0x00, 0x00, 0xA2, 0x00, 0x19, 0x03, 0x01, 0x02, 0xFA, 0x40, 0x00, 0x00, 0x00, 0xFF };
+      std::vector<uint8_t> const actual = encode(thing, true);
       REQUIRE(actual == expected);
     }
   }

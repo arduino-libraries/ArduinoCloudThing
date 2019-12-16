@@ -17,7 +17,7 @@
    PROTOTYPES
  **************************************************************************************/
 
-std::vector<uint8_t> encode(ArduinoCloudThing & thing);
+std::vector<uint8_t> encode(ArduinoCloudThing & thing, bool lightPayload = false);
 void print(std::vector<uint8_t> const & vect);
 
 #endif /* INCLUDE_TESTUTIL_H_ */
