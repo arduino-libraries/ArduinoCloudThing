@@ -23,7 +23,7 @@ SCENARIO("A Arduino cloud property is published periodically", "[ArduinoCloudThi
     thing.begin();
 
     CloudBool test = true;
-    unsigned long const PUBLISH_INTERVAL_SEC = 1 * SECONDS;
+    unsigned long long const PUBLISH_INTERVAL_SEC = 1 * SECONDS;
 
     thing.addPropertyReal(test, "test", Permission::ReadWrite).publishEvery(PUBLISH_INTERVAL_SEC);
 
