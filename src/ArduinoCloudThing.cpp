@@ -145,8 +145,7 @@ void ArduinoCloudThing::decode(uint8_t const * const payload, size_t const lengt
       case MapParserState::BooleanValue : next_state = handle_BooleanValue(&value_iter, map_data); break;
       case MapParserState::LeaveMap     : next_state = handle_LeaveMap(&map_iter, &value_iter, map_data); break;
       case MapParserState::Complete     : /* Nothing to do */                                                   break;
-      case MapParserState::Error        : return;                                                               break;
-    }
+      case MapParserState::Error        : return;
 
     current_state = next_state;
   }
